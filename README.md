@@ -1,12 +1,5 @@
 # Introduction
 
-Open Translation Alias OT un traductor abierto a todas las personas la intención
-de este traductor es brindar la experiencia de cualquer traductor web pero
-en tu escritorio parece un cliche dado que OT necesita internet para su
-funcionamiento, debido a este defecto OT proporciona (Proporcionara !) la
-posibilidad de traducir archivos no como ya lo hace sino de manera inteligente
-para una mayor comodidad.# Introduction
-
 Open Translation Alias (OT) a translator open to all people the intention
 of this translator is to provide the experience of any web translator but
 on your desktop it seems like a click because OT needs internet for its
