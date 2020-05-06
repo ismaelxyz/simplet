@@ -1,0 +1,13 @@
+{
+  "name": "Spanish",
+  "real name": "OT Spanish",
+  "version": "1.0",
+  "author": "Ismael Belisario",
+  "author email": "ismaelbeli.com@gmail.com",
+  "description": "Support of language english for ot.",
+  "license": "GNU GPL 3 or later",
+  "state": "unstable",
+  "interface": "all",
+  "main file": "es.json",
+  "type": "language"
+}

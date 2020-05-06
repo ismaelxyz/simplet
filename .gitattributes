@@ -1,0 +1,17 @@
+
+
+# Binary data types
+#*.aif binary
+
+# Specific binary files
+# Lib/test/sndhdrdata/sndhdr.* binary
+
+# Text files that should not be subject to eol conversion
+# Lib/test/cjkencodings/* -text
+
+# CRLF files
+# *.txt text eol=lf
+
+# Generated files
+# https://github.com/github/linguist#generated-code
+# Include/graminit.h          linguist-generated=true
