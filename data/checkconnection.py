@@ -18,12 +18,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-from requests import get
 
-def check_connection(url='https://github.com'):
+"""
+Script Name: checkconnection.py
+Check connection in your computer.
+"""
+
+def check_connection(url: str='https://github.com') -> str:
+    from requests import get
     try:
-         get(url, timeout=60)
-         return 'On connection.'
+         __import__('requests').get(url, timeout=60)
+         return 'Establish.'
         
     except:
-        return 'Connection not establish.'
+        return 'Not establish.'
+
+
+if __name__ == "__main__":
+    print(check_connection())

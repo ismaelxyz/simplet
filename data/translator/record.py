@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -37,16 +36,29 @@ class Record(object):
         'target': target, 'text': text, 'end_text': end_text, 'headers': headers,
                                             'status_code': status_code}})
 
-    def search(self, name, data, other_data=''):
+    def search(self, _id, data, other_data=''):
         """Search in the list of translations."""
+        if _id == 'all':
+            return self.__list.copy()
 
-        if name == 'last': name = len(self.__list) - 1
-        #print(self.__list)
+        if _id == 'last':
+            _id = len(self.__list) - 1
+        
+        if isinstance(_id, int):
+            num = 0
+            for obj in self.__list:
+                if num == _id:
+                    _id = obj
+                    break
+                num += 1
         try:
-            data = self.__list[name][data]
-            return eval(f"data{other_data}")
+            data = self.__list[_id][data] if data else self.__list[_id]
+            if other_data:
+                return eval(f"data{other_data}")
+            return data
+        
         except KeyError:
-            return [f"KeyError: {name}{data}{other_data} not in histori."]
+            return [f"KeyError: {_id}{data}{other_data} not in histori."]
 
     def del_histori(self, number):
         """Search in the list of translations."""

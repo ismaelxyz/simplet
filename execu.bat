@@ -1,1 +1,0 @@
-OpenTranslation.py -m graphic

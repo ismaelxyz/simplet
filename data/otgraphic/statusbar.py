@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -52,7 +51,7 @@ class OTSB(StatusBar):
     def __init__(self, master):
         super().__init__(master, 'opsb')
     
-    def show_message(self, text, time=2000):
+    def show_message(self, text: str, time: int=2000):
         ## Params:
         # text: text of the message.
         # time: time of show message in the message label.
@@ -61,7 +60,7 @@ class OTSB(StatusBar):
         self.after(time, lambda: self.set_label('message', ""))
     
     def confirm_connectivity(self):
-        self.set_label('connection', 'Connection status: ' + 
+        self.set_label('connection', 'Connection: ' + 
                                   self.check_connection())
     
     def start(self):

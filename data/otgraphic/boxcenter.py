@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -18,8 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-
-# Script Name: boxcenter.py
+"""
+Script Name: boxcenter.py
+"""
 
 from tkinter.ttk import Frame, PanedWindow
 from .scrollbar import OTScrollbar
@@ -29,16 +29,6 @@ from .text import OTText
 class BoxCenter(Frame):
 
     def __init__(self, master, **kw):
-        # Central box (center) for OT.
-        # Structured:
-        #    1-Paned:
-        #       # 2-Frames: (two in the Paned).
-        #          # 2-texts (one for frame).
-        #          # 4-OTScrollbar (two for text, in the frames).
-        
-        ## Param:
-        #   master: Master of this widget.
-
         super().__init__(master, **kw)
         self.__text = ''
     

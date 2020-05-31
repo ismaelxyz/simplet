@@ -38,32 +38,30 @@ class OpenTranslation():
     persons in evolution.
     """
 
-    def __init__(self):
+    def __init__(self, **keywords):
         """Initialize interface selected for the user."""
         # Generic name for Console or Graphic Interface.
         
-        keywords = manager_parse()
-        keywords['name'] = keywords['mode']
-        del keywords['mode']
         self.interface = interface(**keywords)
 
     def mainloop(self):
         """The main loop (the live of this app)."""
         self.interface.mainloop()
-
-def run(func):
-    # Decorator
-    return func()
-
-# The main function of OT (Only One).
-@run
-def main(name=__name__):
-    import py
-    init_app(name, {}, 
-               NAME, {'vaca': 8},
+        
+def main(args=None):
+    
+    init_app(__name__, {}, 
+               NAME, {'Mouse': 8},
              version=VERSION, author=AUTHOR, author_email=AUTHOR_EMAIL,
              description=DESCRIPTION, branch=BRANCH, _license=LICENSE, 
              repository=REPOSITORY, _copyright=COPYRIGHT, commit=COMMIT)
     
-    app = OpenTranslation()
+    args = manager_parse(args) if isinstance(args, list) else manager_parse()
+    args['name'] = args['mode']
+    del args['mode']
+    app = OpenTranslation(**args)
     app.mainloop()
+
+
+if __name__ == "__main__":
+    main()

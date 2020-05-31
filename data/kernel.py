@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -26,12 +25,13 @@ The kernel of OT, manager of the work hard.
 from .settings import *
 from os import linesep
 from .constans import NOTICE
+from data.utilities import yaml_append 
 
 
 class BaseInterface(object):
     """
-    El padre de todas las interfaces en OT.
-    Es el gerente de los errores, la información (en general)
+    The father of all interfaces in OT.
+    By the manager of errors and information (in general).
     """
 
     def __init__(self, name, file=None, output=None, logo=True):
@@ -71,7 +71,7 @@ class BaseInterface(object):
         self._list_settings = ['source', 'target', 'headers', 'url', 'language']
         self.__error_ocurred = False
     
-    def internal_record(action):
+    def internal_record(self, action):
         if action == 'read':
             pass
 
@@ -89,103 +89,88 @@ class BaseInterface(object):
         if self.__logo:
             print(NOTICE)
 
-    def commands(self, command, what=None, **keyward):
-        """Run commands of OT."""
-
-        argv = command.split(' ')[1:]
-        command = command.split(' ')[0]
-
-        out = False
-        if 'file' in keyward:
-            file = keyward['file']
-        if 'out' in keyward:
-            out = keyward['out']
-
-        if command == 'exit':
-            self.destroy()
-            return ''
-        
-        elif command == 'consult':
-            if argv[0] == 'user':
-                return self.__consult_user(what)
-
-        elif command == 'file':
-            return self._t.file_translate(file, out)
-
-        elif command == 'change':
-            if argv[0] == 'lan':
-                if argv[1] == 'source':
-                    self._t.source = argv[2]
-                if argv[1] == 'target':
-                    self._t.target = argv[2]
-            elif argv[0] == 'headers':
-                self._t.headers = argv[1]
-            elif argv[0] == 'url':
-                self._t.url = argv[1]
+    def translate_file(self, _file: str, out: str=''):
+        return self._capture_error(self._t.file_translate(_file, out))
+    
+    def consult_user(self, what):
+        return self.__consult_user(what)
+    
+    def change(self, what, n_value, what2=None):
+        what = what2 or what
+    
+        if hasattr(self._t, what):
+            setattr(self._t, what, n_value)
             
-            if argv[0] in self._list_settings or\
-               argv[1] in self._list_settings:
-                set_setting({argv[-2]: argv[-1]})
-                print(get_setting('theme'))
+        if what in self._list_settings:
+            set_setting({what: n_value})
+            return True
+    
+    def insert_idioms(self, *kw):
+        add_idioms(*kw)
 
-        elif command == 'insert':
-            if argv[0] == 'idiom':
-                self._t.source = argv[1]
-                add_idioms(argv[1])
+    def see_config(self, what, what2=None):
+        
+        if what == 'lan':
 
-        elif command == 'see':
+            if what2 == 'source':
+                return self._t.source
 
-            if argv[0] == 'lan':
-                if argv[1] == 'source':
-                    return self._t.source
-                elif argv[1] == 'target':
-                    return self._t.target
-            elif argv[0] == 'idioms':
-                return get_idioms()
-            elif argv[0] == 'headers':
-                return self._t.headers
-            elif argv[0] == 'url':
-                return self._t.url
-            elif argv[0] == 'all':
-                return self._t.see_all()
+            elif what2 == 'target':
+                return self._t.target
+           
+        elif what == 'idioms':
+            return get_idioms()
+           
+        elif what == 'headers':
+            return self._t.headers
+           
+        elif what == 'url':
+            return self._t.url
+           
+        elif what == 'all':
+            return self._t.see_all()
+           
+        elif what == 'size':
             # size in len not in bytes; NOTE: Create space for bytes
-            elif argv[0] == 'size':
-                return self._t.size()
-            elif argv[0] in self._list_settings:
-                return get_setting(argv[0])
-
-        elif command == 'del':
-            return f"{self._t.del_histori(int(argv[0]))}"
-
-        elif command == 'save':
-            for x in argv:
-                argv[0] += ' ' + x
-            return self._t.save_translation(argv[0].rstrip(), out)
-
-        elif command == 'search':
-            if command.isdigit():
-                command = int(command)
-            return self._t.search(*argv)
-
-        else:
-            return f"Error: Unknown command: {command}."
+            return self._t.size()
+        
+        elif what in self._list_settings:
+            return get_setting(what)
+    
+    def delete_these(self, these, *value):
+        # ;)
+        if these == 'record':
+            return f"{self._t.del_histori(value[0])}"
+            
+        if these == 'idioms':
+            del_idioms(*value)
+            return True
+    
+    def save_translation(self, text, file_out):
+        return self._capture_error(self._t.save_translation(text, file_out))
+    
+    def search_in_record(self, *argv):
+        self._capture_error(self._t.search(*argv))
 
     def _view_translate(self, data):
         raise NotImplementedError('This methods is for subclass.')
+
+    def show_message(self, text: str):
+        """Show message for the user."""
+        raise NotImplementedError("This method is for subclass.")
     
-    def create_error(self, info):
+    def _capture_error(self, info):
         # If info is type list an error as ocurred in this case capture these
-        # error.
+        # error and send message.
 
         if isinstance(info, list):
             self.__error_ocurred = True
-            info = info[0]
+            self.show_message(info[0])
+            info = ''
         return info
 
     def translate(self, text):
-        text = self._t.translate(text)
-        
-        return self.create_error(text)
+        return self._capture_error(self._t.translate(text))
 
     @property
     def _file_and_output(self):
@@ -209,10 +194,7 @@ class BaseInterface(object):
         traducción.
         """
         if self.__file:
-            data = self.commands('file', file=self.__file, out=self.__output)
-            if isinstance(data, list):
-                data = data[1][0]
-            self._view_translate(data)
+            self._view_translate(self.translate_file(self.__file, self.__output))
 
     def output_file(self):
         """
@@ -220,7 +202,7 @@ class BaseInterface(object):
         """
         exit("In output_file")
 
-        self.__write_file(self.__output, text)
+        # self.__write_file(self.__output, text)
 
     def process(self):
         """
@@ -237,13 +219,13 @@ class BaseInterface(object):
         try:
             self.process()
         except KeyboardInterrupt:
-            print('Interrupt for Key')
-            self.commands('exit')
+            self.show_message('Interrupt for Key')
+            self.destroy()
 
     def mainloop(self):
         """Main loop for all interfaces."""
         self.not_interrupt()
 
-    def destroy(self):
+    def destroy(self, _file='history.yml'):
         """This methods is for subclass."""
-        pass
+        yaml_append(_file, self._t.search('all'))

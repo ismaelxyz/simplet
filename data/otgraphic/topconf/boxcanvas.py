@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -20,14 +19,13 @@
 
 """
 Script Name: canvasbox.py
-Description:
+
 """
 
 from tkinter import Tk, Canvas, Frame
 from tkinter.ttk import Frame, Scrollbar
-from turtle import __forwardmethods
-#from py import io
-#from turtledemo
+from ..utils import __forwardmethods
+
 
 class BoxCanvas(Frame):
     """Modeled after the scrolled canvas class from Grayons's Tkinter book.

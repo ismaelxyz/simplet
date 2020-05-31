@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -24,46 +23,40 @@ Widget of settings of OTGraphic.
 """
 
 from tkinter.ttk import Frame, Button, Style, LabelFrame, Label
-from data.utilities import yaml_load_except, force_path, yaml_dump
+# from data.utilities import yaml_load_except, force_path, yaml_dump
 from ..toplevel import OTToplevel
-from .topbox import TopCombobox
+from ..combobox import OTACombobox
 from .boxcanvas import BoxCanvas
+
 
 class TopConf(OTToplevel):
 
-    def __init__(self, master, title='Open Translation: Configuration'):
+    def __init__(self, master: str, title: str='Configuration'):
         super().__init__(master, title)
-        #self.title(title)
         
         self.screens.update(Language=self.language, Record=self.record,
-                            Internal=self.internal, Extensions=self.extensions)
+                        Internal=self.internal, Intelligence=self.intelligence,
+                        Extensions=self.extensions)
         
-        # Create main dir (Of TofConf) if not exist and sync conf.
-        self.__home = \
-            self.master.commands('consult user', 'Home OT') + '/topconf'
-        self.__file_conf = self.__home + '/settings.yml'
-        force_path(self.__home)
-        
-        self.__config = {'language': self.master.commands('see language'),
+        self._config = {'language': self.master.see_config('language'),
                          'languages': self.master.ext.search('language',
                                                             what='name'),
                          'screen': 'language',
                          'extensions': {'enabled': {}, 'disabled': {}}
         }
-        self.__config.update(yaml_load_except(self.__file_conf, _type={}))
-
-        # self.__screen = ''
+        
+        self._sync_conf('conf')
+        
         self.__vertical_butoms()
-        getattr(self, self.__config['screen'])()
+        getattr(self, self._config['screen'])()
         
         # "#9e9a91"
         # #eaeaea #afaf9f
 
-    
-    def set_configuration(self, key, value):
-        self.__config[key] = value
+    def set_configuration(self, key, value, ke2=None):
+        self._config[key] = value
         if key in self.master._list_settings:
-            self.master.commands(f"change {key} {value}")
+            self.master.change(key, value, ke2)
 
     def __vertical_butoms(self):
         left = Frame(self, name='left')
@@ -86,9 +79,11 @@ class TopConf(OTToplevel):
         ll = Label(lfe, text=text, style='la2.TLabel')
         ll.pack(padx=5, side='left')
 
-        otacx = TopCombobox(lfe, key, self,
-                            self.__config[values])
-        otacx.set(self.__config[key])
+        # TopCombobox
+        otacx = OTACombobox(lfe, key, self.set_configuration,
+                            self._config[values])
+                            
+        otacx.set(self._config[key])
         otacx.pack(pady=5, padx=10, side='left')
 
     def language(self):
@@ -98,11 +93,15 @@ class TopConf(OTToplevel):
             
     def record(self):
         if self._clear_screen('record'):
-            fr = self.basic_frame()
+            print('record')
+    
+    def intelligence(self):
+        if self._clear_screen('intelligence'):
+            print("intel")
     
     def internal(self):
         if self._clear_screen('internal'):
-            fr = self.basic_frame()
+            print("internal")
     
     def extensions(self):
         if self._clear_screen('extensions'):
@@ -113,10 +112,5 @@ class TopConf(OTToplevel):
     
     def destroy(self):
         """Save config and delete widget."""
-        del self.__config['languages'], self.__config['language']
-        yaml_dump(self.__file_conf, self.__config)
-        super().destroy()
-
-# Name: name for the label.
-# Real name: name of the estencion.
-# Types: theme, language
+        del self._config['languages'], self._config['language']
+        super().destroy('conf')

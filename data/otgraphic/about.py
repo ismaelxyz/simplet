@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -33,37 +32,62 @@ from data.utilities import find_with_glob, read_file
 from os.path import join
 
 
+# TopFrame(): 
+
 class TopAbout(OTToplevel):
 
-    def __init__(self, master, title='Open Translation: About'):
+    def __init__(self, master, title='About'):
         super().__init__(master, title)
+
         self['bg'] = "red"
+
+        self.index = {
+            'application': 0,
+            'author': 1,
+            'license': 2
+        }
+        self._config = {'screen': 'application'}
+        
+        self._sync_conf('about')
 
         self.fr = Frame(self)
         self.fr.pack(fill='both', expand='yes')
         
-        self.lb = Label(self.fr, name="logo") # Label for logo
-        self.lb.pack(pady=4)
+        self.lb = Label(self.fr) # Label for logo
+        self.lb.pack(pady=7)
 
         path_logo = find_with_glob(join('data+otgraphic', 'images'),
-                                        '*logo48.png', True)[0]
-        self.tk.eval(f"display_logo {path_logo}")
+                                        '*logo117.png', True)[0]
+        self.tk.eval(f"display_logo {path_logo} {self.lb}")
         
         self.note = Notebook(self.fr)
         self.note.pack(fill='both', expand='yes')
 
-        self.tab_app = Frame(self.note)
-        self.note.add(self.tab_app, text="Application")
+        self.tab_app = Frame(self.note, name='application')
+        self.note.add(self.tab_app, text='Application')
         self.label_app()
 
-        self.tab_author = Frame(self.note)
-        self.note.add(self.tab_author, text="Author")
+        self.tab_author = Frame(self.note, name='author')
+        self.note.add(self.tab_author, text='Author')
         self.label_author()
 
-        self.tab_license = Frame(self.note)
-        self.note.add(self.tab_license, text="License")
+        self.tab_license = Frame(self.note, name='license')
+        self.note.add(self.tab_license, text='License')
         self.widget_license()
 
+        self.note.enable_traversal()
+        self.note.select(self.index[self._config['screen']])
+        self.note.bind('<ButtonPress>', lambda x: self._clear_screen())
+    
+    def set_configuration(self, *kw):
+        self._config[kw[0]] = kw[1]
+
+    def __to_call(self):
+        """Call to  _clear_screen (SuperClass); NOTE: Error in lambda."""
+        super()._clear_screen(self.note.select().split('.')[-1], False)
+
+    def _clear_screen(self):
+        self.after(120, self.__to_call)
     
     def label_app(self):
         self.lba = Label(self.tab_app, text=self.text_app())
@@ -108,19 +132,6 @@ class TopAbout(OTToplevel):
         self.tk.eval(f"text_stylize {text}")
         text.pack(fill='both', expand='yes')
         text.window_create('1.0')
-
-"""
-ven = Tk()
-asd = TopHelp(ven)
-ven.mainloop()
-
-
-Version: 1.44.2 (user setup)
-Commit: ff915844119ce9485abfe8aa9076ec76b5300ddd
-Date: 2020-04-16T16:33:57.013Z
-Electron: 7.1.11
-Chrome: 78.0.3904.130
-Node.js: 12.8.1
-V8: 7.8.279.23-electron.0
-OS: Windows_NT ia32 6.1.7601
-"""
+    
+    def destroy(self):
+        super().destroy('about')

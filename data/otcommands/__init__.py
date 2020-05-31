@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-
-# Script Name: commands/__init__.py
-# Interface of commands for OT.
+"""
+Script Name: commands/__init__.py
+Interface of commands for OT.
+"""
 
 from data.kernel import BaseInterface
 from .commands import OTCommands
@@ -36,11 +37,14 @@ class Interface(OTCommands, BaseInterface):
             self.__output = kw[1]
         super().__init__('commands', *kw)
     
+    def show_message(self, text: str):
+        stderr.write(text)
+    
     def process(self):
         self.print_notice()
         print()
         if self._file_and_output in (3, 1):
-            stderr.write('Error: Not give input file.\n')
+            self.show_message('Error: Not give input file.\n')
         
         else:
             self.show_file()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -152,18 +151,19 @@ class OTOptionParser(OptionParser):
         self.add_option('-b', '--branch', action='branch', 
                         help='Show program branch and exit.')
         #  -> Optional[dict, type]
-    def parse_args(self, dic: bool=False):
+    def parse_args(self, args=None, values=None, dic: bool=True):
         # Return the options and args of user.
 
         ## Param
         # dic: Change type opts of Values to dict.
 
         if dic :
-            opts, args = super().parse_args()
+            opts, args = super().parse_args(args, values)
             return opts.__dict__, args
-        return super().parse_args()
+            
+        return super().parse_args(args, values)
 
-def run_parser() -> type:
+def run_parser(args=None) -> type:
     parser = OTOptionParser()
 
 
@@ -178,13 +178,18 @@ def run_parser() -> type:
 
     parser.add_option('-n', '--notice', default='true', metavar='BOOL', help='S'
     "how notice program states: true (t) or false (f) [default: %default.]")
-    
-    return parser.parse_args(True)
 
-def manager_parse():
+    if isinstance(args, list):
+        return parser.parse_args(args)
+
+    return parser.parse_args() 
+
+def manager_parse(args=None):
     # Manager of parse for OT.
+    
 
-    opts, args = run_parser()
+    opts, args = run_parser(args) if isinstance(args, list) else run_parser()
+    
     if opts['notice'] in ('t', 'true'): opts['notice'] = True
     if opts['notice'] in ('f', 'false'): opts['notice'] = False
     
@@ -198,5 +203,4 @@ def manager_parse():
     
     if args:
         opts['file'] = args[0]
-    
     return opts

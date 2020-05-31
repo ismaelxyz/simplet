@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -101,10 +100,10 @@ class Translator(object):
         except requests.exceptions.HTTPError:
             return ["Error: Your HTTP not exist."]
 
-    def search(self, name='last', data='[end_text]', other_data=''):
+    def search(self, _id='last', data='[end_text]', other_data=''):
         """Find in the reccord."""
 
-        return self.__record.search(name, data, other_data)
+        return self.__record.search(_id, data, other_data)
 
     def save_translation(self, data, name_file='out.tc'):
         data = self.translate(data)
@@ -137,4 +136,4 @@ class Translator(object):
                 return self.translate(data)
         else:
             # File not exist.
-            return [name_file, data]
+            return data

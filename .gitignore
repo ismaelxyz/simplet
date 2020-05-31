@@ -31,14 +31,8 @@ Spam
 *.cr
 *.tc
 
-## Images
-*.gif
-
 ## C/C++.
 *.exe
-*.cpp
-*.c
-*.h
 
 ## Plain Text.
 *.txt
@@ -49,7 +43,6 @@ Spam
 ## Zip.
 *.zip
 
-# web rust: https://github.com/rust-lang/book/tree/master/src
 ## Rust
 start.rs
 start.pdb
@@ -58,6 +51,8 @@ start.pdb
 data/settings/decoder.py
 data/extensions/door/studier.tcl
 data/extensions/door/menu.tcl
+data/custom.c
 test.py
 embeber
 test.*
+# data/utilities.py

@@ -1,4 +1,4 @@
-proc display_logo {path} {
+proc display_logo {path widget} {
   image create photo ::img::logo -format PNG -file $path
-  .!topabout.!frame.logo configure -image ::img::logo
+  $widget configure -image ::img::logo
 } 

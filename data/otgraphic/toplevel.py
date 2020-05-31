@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -25,6 +24,7 @@ Support of toplevel for OTGraphic.
 
 from tkinter import Toplevel
 from typing import TypeVar
+from data.utilities import yaml_load_except, force_path, yaml_dump, yaml_append
 #from . import create_logo
 T = TypeVar('T')
 
@@ -33,23 +33,28 @@ class OTToplevel(Toplevel):
     def __init__(self, master, title: str):
         
         super().__init__(master)
-        self.title(title)
+        self.title('Open Translation: ' + title)
         self.grab_set()
         self.transient(master=master)
         self.master.create_logo(self)
         
+        # Create main dir (Of TofConf) if not exist and sync conf.
+        self._home = self.master.consult_user('Home OT') + '/tops'
+        self._file_conf = self._home + '/settings.yml'
+        force_path(self._home)
+
         # XXX: Formule deficient in full screen.
         size = lambda x: int(x) - int(int(x) * 0.06)
-        #  Note: Las pantallas tienen mas x que y (ancho que alto).
+        
         loc_x = lambda x, x2: int(int(x) * 0.03) + int(x2)
         loc_y = lambda x, x2: int(int(x) * 0.045) + int(x2)
         
         a, b = self.master.geometry().split('x')
         b, c, d = b.split('+')
         self.geometry(f"{size(a)}x{size(b)}+{loc_x(a, c)}+{loc_y(b, d)}")
-
-        self.__screen = ''
-        self.screens = {}
+        
+        # Vars for subclass.
+        self.screens, self._config, self.__screen  = {}, {}, ''
     
     def opack(self, obj, **kw):
         obj.pack(**kw)
@@ -57,7 +62,7 @@ class OTToplevel(Toplevel):
     def set_configuration(self, name: str, value: T):
         raise NotImplementedError("This method is for subclasses.")
 
-    def _clear_screen(self, screen: str):
+    def _clear_screen(self, screen: str, clear: bool=True):
         """
         Control of screen for interactives toplevels.
         XXX: Please Use with caption.
@@ -66,8 +71,19 @@ class OTToplevel(Toplevel):
         if self.__screen != screen:
             self.__screen = screen
             self.set_configuration('screen', screen)
-
-            for x in self.children.copy():
-                if x != 'left': self.children[x].destroy()
+            if clear:
+                for x in self.children.copy():
+                    if x != 'left': self.children[x].destroy()
             return True
         return False
+    
+    def _sync_conf(self, seccion: str):
+        """Sync configuration in the topslevels"""
+        cong = yaml_load_except(self._file_conf, _type={})
+        if seccion in cong:
+            self._config.update(cong[seccion])
+    
+    def destroy(self, seccion: str):
+        """Save config and delete widget."""
+        yaml_append(self._file_conf, self._config, seccion)
+        super().destroy()

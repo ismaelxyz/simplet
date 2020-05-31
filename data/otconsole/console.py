@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -23,30 +22,46 @@ Script Name: console.py
 Support for interface console for OT.
 """
 
+from sys import stderr
+
 class OTConsole(object):
     
     def __init__(self):
+    
         self.__close = False
     
-    def commands(self, command):
-        if command == 'exit':
-            return 'Bye.'
+    def commands(self, command: None=None):
+        # This method is for subclass.
+        self.show_message('Bye.')
+        
+    def show_message(self, text: str):
+        skip = ''
+        if text in ('Interrupt for Key', 'Bye.'):
+            skip = "\n"
+
+        elif text[-2:] != '\n\n':
+            # XXX: Problen whit ending line in the end of program.
+            skip = '\n' if '\n' == text[-1] else '\n\n'
+        stderr.write(text + skip) 
 
     def translate(self, text):
-        return f"Translation:\n\n {text}\n"
+        return f"Translation:\n\t{text}"
     
     def process(self):
         from time import sleep
 
+        print()
         while self.__close == False:
-            text = input(">: ")
-    
+            text = input(">: ").strip()
+            # print(end='\n')
+            
             if '.\\' == text[0:2]:
-                print('\n', self.commands(text[2:]))
+                self.commands(text[2:].split(' '))
 
             else:
-                print('\n', self.translate(text))
+                text = self.translate(text)
+                self.show_message(text) if text else ''
                 sleep(0.5)
-                
+
     def destroy(self):
         self.__close = True

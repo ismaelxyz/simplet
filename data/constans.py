@@ -30,7 +30,7 @@ VERSION = '1.0'
 BRANCH = 'unstable'
 LICENSE = 'GNU GPL 3 or later version'
 COMMIT = 'fcfacc51'
-REPOSITORY = 'https://github.com/ismaelxyz/Open-Translate'
+REPOSITORY = 'https://github.com/ismaelxyz/OpenTranslation'
 COPYRIGHT = 'Copyright © 2020 Ismael Belisario'
 DESCRIPTION = 'A Translate for all persons, in evolution.'
 

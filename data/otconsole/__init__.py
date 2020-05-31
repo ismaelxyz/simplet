@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -18,13 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-
-# Script Name: otconsole/__init__.py
-# Interface console for OT.
+"""
+Script Name: otconsole/__init__.py
+Interface console for OT.
+"""
 
 from .console import OTConsole
 from data.kernel import BaseInterface
 from .otcolorama import init, Fore, Back
+from sys import stderr
+
 """
 # from otcolorama.winterm import WinTerm
 init()
@@ -40,10 +42,11 @@ class Interface(OTConsole, BaseInterface):
         BaseInterface.__init__(self, 'console', *kw)
     
     def translate(self, text):
+        #### Deprecate
         text = BaseInterface.translate(self, text)
 
         if self.error_ocurred:
-            return text + "\n"  # Text of Error.
+            return text  # Text of Error.
 
         return super().translate(text)
     
@@ -51,28 +54,53 @@ class Interface(OTConsole, BaseInterface):
         self.print_notice()
         super().process()
     
-    def commands(self, command):
-        if command[:5] == 'save ':
-            return BaseInterface.commands(self, command, 
-                   out=input('Save in file?: '))
+    def commands(self, args: list):
+
+        if args[0] == 'consult':
+            if args[1] == 'user':
+                self.show_message(self.consult_user(args[2]))
         
-        elif command[:5] == 'file ':
-            file=input('File to translate?: ')
-            print('')
-            out=input('Save in file?: ')
-            return BaseInterface.commands(self, command, file=file, out=out)
+        elif args[0] == 'file':
+             self.translate_file(input('File to translate: '), 
+                                 input('\nSave in file?: '))
         
-        result = BaseInterface.commands(self, command)
-       
-        if command == 'exit':
-            return super().commands(command)
+        elif args[0] == 'change':
+            
+            if self.change(*args[1:]):
+                self.show_message('Done change.')
+            else:
+                self.show_message('Fail change.')
+                
+        elif args[0] == 'insert':
+            if args[1] == 'idioms':
+                self.insert_idioms(*args[2:])
+        
+        elif args[0] == 'see':
+            result = str(self.see_config(*args[1:]) or '')
+            self.show_message(args[-1] + '\n\t' + result) if result else ...
+        
+        elif args[0] == 'del':
+            self.delete_these(*args[1:])
+        
+        if args[0] == 'save':
+           self.save_translation(input('Text to translate: '), 
+                                 input('\nSave in file?: '))
+
+        if args[0] == 'search':
+            if args[1].isdigit():
+                args[1] = int(args[1])
+            self.search_in_record(*args[1:])
+        
+        elif args[0] == 'file ':
+            self.show_message(self.translate_file(input('File to translate?: '), 
+                                                  input('Save in file?: ')))
+        
+        elif args[0] == 'exit':
+            super().commands()
+            self.destroy()
         """
         XXX In the future implement
         import sys
         sys.stdin.read()
         ^Z for exit
         """
-        return result
-    
-    def destroy(self):
-        super().destroy()

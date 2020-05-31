@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -18,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-
-# Script Name: combobox.py
-
+"""
+Script Name: combobox.py
+"""
 
 from tkinter.ttk import Combobox, Label, Frame
 from random import choice
@@ -32,21 +31,24 @@ class OTACombobox(Combobox):
         Autocomplete text in this combobox
     """
 
-    def __init__(self, master, completevalues=None, sync=False, **kwargs):
+    def __init__(self, master: str, key: str, call_to=None, completevalues=None,
+                       sync: bool=False, **kwargs):
+    #(self, master: type, completevalues=None, sync=False, **kwargs):
         
         """
         Create an AutocompleteCombobox.
-
-        :param master: master widget
-        :type master: widget
-        :param completevalues: autocompletion values
-        :type completevalues: list
-        :param kwargs: keyword arguments passed to the :class:`Combobox` initializer
+                        Params
+        master: A Tk() widget.
+        completevalues: A list with all texts in this widget or None.
+        sync: .
+        kwargs: .
         """
 
-        self.__text = ''
         super().__init__(master, values=completevalues, **kwargs)
+        self.__text = ''
         self._completion_list = completevalues
+        self.__key = key
+        self.__call_to = call_to
        
         if isinstance(completevalues, list):
             self.set_completion_list(completevalues)
@@ -87,6 +89,10 @@ class OTACombobox(Combobox):
         if self.sync_v:
             self.__sync()
             self.icursor('end')
+        
+        if self.__call_to and self.get() != self.__text:
+                self.__call_to(self.__key, self.get())
+
         self.__text = ''
         return False
 
@@ -260,15 +266,20 @@ class OTBCombobox(Frame):
         self.separator = Frame(self, width=12)
         self.label_from = Label(self, text=text)
 
-        idioms = self.master.commands('see idioms')
-        self.combobox_from = OTACombobox(self, idioms)
+        idioms = self.master.see_config('idioms')
+        self.combobox_from = OTACombobox(self, 'source', self.change_lan, idioms)
+        
         self.label_arrow = Label(self, text=text_arrow)
+
         self.label_to = Label(self, text=text2)
-        self.combobox_to = OTACombobox(self, idioms)
+        self.combobox_to = OTACombobox(self, 'target', self.change_lan, idioms)
+    
+    def change_lan(self, key, value):
+        self.master.change('lan', value, key)
 
     def set_combo(self):
-        self.combobox_from.set(self.master.commands('see lan source'))
-        self.combobox_to.set(self.master.commands('see lan target'))
+        self.combobox_from.set(self.master.see_config('lan', 'source'))
+        self.combobox_to.set(self.master.see_config('lan', 'target'))
 
     def start(self):
         self.separator.pack(side='left')

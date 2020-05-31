@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright © 2020 Ismael Belisario
@@ -36,8 +35,7 @@ from tkinter import PhotoImage
 from os.path import join
 
 
-
-# Note: Tk is Windows in this Project
+# NOTE: Tk is Windows in this Project.
 class OTWindows(Tk):
     # This is a superclass only use whit subclass.
 
@@ -47,8 +45,6 @@ class OTWindows(Tk):
         self.title('Open Translation')
     
         self.create_logo(self)
-        #self.ot_logo = PhotoImage('ot_logo', format='png', file=path_logo)
-        #self.tk.call('wm', 'iconphoto', self._w, self.ot_logo)
         
         # FIXME: If your see this color in the windows OT Failure.
         self['background'] = 'red'
@@ -63,15 +59,17 @@ class OTWindows(Tk):
         self.tk.eval('source %s' % img_load)
 
     def start(self):
+
         self.load_menu()
-        self.make_idiom_area()
+        self.load_idiom_area()
         self.load_box_center()
         self.load_statusbar()
+
         # Text widgets
         self.translate = self.box_center.text_translate
         self.translation = self.box_center.text_translation
 
-    def make_idiom_area(self):
+    def load_idiom_area(self):
         self.combobox = OTBCombobox(self)
         self.combobox.start()
 
@@ -87,10 +85,10 @@ class OTWindows(Tk):
         self.statusbar = OTSB(self)
         self.statusbar.start()
 
-    def save_result(self):
+    def save_result(self) -> str:
         return asksaveasfilename(filetypes=self.__ftypes)
 
-    def tranlate_file(self):
+    def tranlate_file(self) -> str:
         return askopenfilename(filetypes=self.__ftypes)
 
     def save_tranlate_file(self) -> str:
@@ -104,10 +102,9 @@ class OTWindows(Tk):
         TopAbout(self)
     
     # Polymorphism for Windows and Toplevels.
-    #@classmethod
     def create_logo(self, cls: type):
         """Insert logo in the windows or Toplevel."""
         path_logo = find_with_glob(join('data+otgraphic', 'images'),
-                                    '*logo7.png', True)[0]
+                                    '*logo13.png', True)[0]
         cls.ot_logo = PhotoImage('ot_logo', format='png', file=path_logo)
         cls.tk.call('wm', 'iconphoto', cls._w, cls.ot_logo)
