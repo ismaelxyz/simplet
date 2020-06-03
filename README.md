@@ -37,3 +37,8 @@ podrian existir errores en el además el futuro de este es ser un traductor
 inteligente, de modo que se puedan traducir archivos complejos en el, tener una
 extención de traducción por voz, guardado inteligente; una mejor interfas
 grafica.
+
+## Requirements
+
+Python 3.8 or later with modules requests >= (2.23.0), tkinter >= (8.6),
+yaml (recommend ultimate version).

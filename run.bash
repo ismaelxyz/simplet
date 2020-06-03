@@ -17,5 +17,7 @@
 
 # Script Name: run.bash
 
-# Are you in Linux?, run this file for mode graphic.
+# Are you in Linux?
+
+# Change graphic for commands or console, for a diferect gui.
 python OpenTranslation.py -m graphic

@@ -17,5 +17,7 @@
 
 :: run.bat
 
-:: Are you in Windows?, run this file for mode graphic
+:: Are you in Windows? Send2Trash
+
+:: Change graphic for commands or console, for a diferect gui.
 OpenTranslation.py -m graphic

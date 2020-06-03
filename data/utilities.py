@@ -126,6 +126,7 @@ def yaml_append(file, data, seccion=False, re=False, _type={}, recursive=False):
         else:
             old_data.update({seccion: data})
     else:
+        
         if isinstance(_type, dict):
             old_data.update(data)
         
