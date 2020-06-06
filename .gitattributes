@@ -18,7 +18,8 @@
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
 # Binary data types
-#*.aif binary
+*.exe binary
+*.pyd binary
 
 # Specific binary files
 # Lib/test/sndhdrdata/sndhdr.* binary
@@ -27,7 +28,8 @@
 # Lib/test/cjkencodings/* -text
 
 # CRLF files
-# *.txt text eol=lf
+*.txt Text eol=lf
+*.bat Batch eol=crlf
 
 # Generated files
 # https://github.com/github/linguist#generated-code

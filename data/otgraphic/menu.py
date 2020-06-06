@@ -55,7 +55,7 @@ class OTMenu(Menu):
         self.topbar = {'System': {'Config separator': self.master.top_conf,
                                   'Exit': self.master.destroy
                                     },
-                       'Translate': {
+                       'File': {
                                 'Save result': self.master.save_result,
                                 'Translate file': self.master.tranlate_file,
                                 'Translate file and save result': self.master.save_tranlate_file

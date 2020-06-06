@@ -51,7 +51,10 @@ start.pdb
 data/settings/decoder.py
 data/extensions/door/studier.tcl
 data/extensions/door/menu.tcl
+#data/otgraphic/windows.py
 data/custom.c
+data/otgraphic/turtledemo
+data/otgraphic/git-gui 
 test.py
 embeber
 test.*

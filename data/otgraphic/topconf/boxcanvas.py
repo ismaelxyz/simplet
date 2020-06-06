@@ -62,6 +62,7 @@ class BoxCanvas(Frame):
                 column=1, rowspan=1, columnspan=1, sticky='news')
         self.hscroll.grid(padx=1, in_ = self, pady=1, row=1,
                 column=0, rowspan=1, columnspan=1, sticky='news')
+        
         from tkinter import Frame as tkfr
         self.frame = tkfr(self.canvas, bg='blue', width=100, height=50)
         self.canvas.create_window(0, 0, window=self.frame, tag='frame')

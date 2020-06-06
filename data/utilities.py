@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Open Translation. If not, see <https://www.gnu.org/licenses/>.
 
-
-# Script Name: utilities.py
+"""
+Script Name: utilities.py
+"""
 
 from os import makedirs
 from os.path import isdir, dirname, isfile, abspath
@@ -126,7 +127,7 @@ def yaml_append(file, data, seccion=False, re=False, _type={}, recursive=False):
         else:
             old_data.update({seccion: data})
     else:
-        
+
         if isinstance(_type, dict):
             old_data.update(data)
         

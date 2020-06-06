@@ -22,11 +22,21 @@
 
 # source statusbar.tcl
 
-# -XXX: Tk/Ttk Commands: winfo wm destoy :XXX-
-
+# FIXME: Covertir esto de procedural a POO. [Comment in Spanhis]
+# -XXX: Tk/Ttk Commands: winfo wm destoy tkwait Dialog :XXX-
+# unset var # del variable
 # class StatusBar(Frame):
 
+# set cmd [list]
+# error "class $class already declared"
+
 # Attributes of class OTStatusbar.
+
+#switch [llength $args] {
+#	0 { set new [list $name] }
+#	1 { set new [list $name [lindex $args 0]] }
+#	default { error "wrong # args: field name value?" }
+#}
 
 variable list_childres { }
 

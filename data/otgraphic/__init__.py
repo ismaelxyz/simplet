@@ -31,8 +31,10 @@ from threading import Thread
 class  Interface(OTWindows, BaseInterface):
 
     def __init__(self, *kw):
- 
+
         super().__init__()
+        from data.checkconnection import check_connection
+        self.tk.createcommand('check_connection', check_connection)
         BaseInterface.__init__(self, 'graphic', *kw)
 
         self._list_settings.append('theme')
@@ -41,7 +43,7 @@ class  Interface(OTWindows, BaseInterface):
     def show_message(self, text: str, time: int=2500):
         if text.startswith('Error: '):
             text = text[7:].capitalize()
-        self.statusbar.show_message(text, time)
+        self.tk.call("show_message", text, time)
 
     def changet_theme(self, theme: str=''):
 
@@ -69,11 +71,11 @@ class  Interface(OTWindows, BaseInterface):
         elif theme in self.tk.eval('ttk::style theme names').split(' '):
             self.tk.eval(f"ttk::style theme use {theme}")
     
-    def create_default_commands(self):
-        # This is for Tk 
+    def __create_default_commands(self):
+        # This is for Tk
+
         self.tk.createcommand('package_dir', self.ext.pack_name)
         self.tk.createcommand('do_translation', self.__translate)
-        self.tk.createcommand('find_with_glob', find_with_glob)
         super().create_default_commands()
 
     def process(self):
@@ -82,7 +84,7 @@ class  Interface(OTWindows, BaseInterface):
         self.translate['width'] = 35
         self.changet_theme()
         #self.top_conf()
-        self.create_default_commands()
+        self.__create_default_commands()
         
         bind_text = find_with_glob('data', '*/bindtext.tcl', True)[0]
         self.tk.eval(f"source {bind_text}")
@@ -130,6 +132,7 @@ class  Interface(OTWindows, BaseInterface):
         _file='translate.cr'
         f_result='translation.tc'
         """
+        
         file, out = super().save_tranlate_file()
 
         if file == '' or out == '':

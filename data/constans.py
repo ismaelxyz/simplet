@@ -27,9 +27,9 @@ All constans of OT "Your valors are kernely".
 # Data app.
 NAME = 'Open Translation'
 VERSION = '1.0'
-BRANCH = 'unstable'
+BRANCH = 'Unstable'
 LICENSE = 'GNU GPL 3 or later version'
-COMMIT = 'fcfacc51'
+COMMIT = '61c4ea60'
 REPOSITORY = 'https://github.com/ismaelxyz/OpenTranslation'
 COPYRIGHT = 'Copyright © 2020 Ismael Belisario'
 DESCRIPTION = 'A Translate for all persons, in evolution.'

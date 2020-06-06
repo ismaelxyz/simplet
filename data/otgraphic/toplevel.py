@@ -23,10 +23,7 @@ Support of toplevel for OTGraphic.
 """
 
 from tkinter import Toplevel
-from typing import TypeVar
 from data.utilities import yaml_load_except, force_path, yaml_dump, yaml_append
-#from . import create_logo
-T = TypeVar('T')
 
 class OTToplevel(Toplevel):
 
@@ -36,7 +33,7 @@ class OTToplevel(Toplevel):
         self.title('Open Translation: ' + title)
         self.grab_set()
         self.transient(master=master)
-        self.master.create_logo(self)
+        self.tk.eval(f"create_logo {self}")
         
         # Create main dir (Of TofConf) if not exist and sync conf.
         self._home = self.master.consult_user('Home OT') + '/tops'
@@ -59,7 +56,7 @@ class OTToplevel(Toplevel):
     def opack(self, obj, **kw):
         obj.pack(**kw)
 
-    def set_configuration(self, name: str, value: T):
+    def set_configuration(self, name: str, value):
         raise NotImplementedError("This method is for subclasses.")
 
     def _clear_screen(self, screen: str, clear: bool=True):

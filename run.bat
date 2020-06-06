@@ -17,7 +17,9 @@
 
 :: run.bat
 
-:: Are you in Windows? Send2Trash
+@echo off
+
+:: Are you in Windows?
 
 :: Change graphic for commands or console, for a diferect gui.
 OpenTranslation.py -m graphic
