@@ -84,9 +84,8 @@ class OTWindows(Tk):
       self.box_center.start()
 
     def load_statusbar(self):
-        #self.statusbar = OTSB(self)
-        #self.statusbar.start()
-        self.tk.eval("source C:/Users/juan/Documents/Ismael/Proyectos/OpenTranslation/data/otgraphic/statusbar.tcl")
+        
+        self.tk.call("source", find_with_glob('data+otgraphic', '*statusbar.tcl', True)[0])
         self.tk.eval("statusbar_start")
 
     def save_result(self) -> str:
