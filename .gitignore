@@ -56,6 +56,10 @@ data/custom.c
 data/otgraphic/turtledemo
 data/otgraphic/git-gui 
 test.py
+*.svg
+.sublime
+data-science.png
+kwargs.tcl
 embeber
 test.*
 # data/utilities.py

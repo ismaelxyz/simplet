@@ -31,8 +31,6 @@ from .combobox import OTBCombobox
 from .topconf import TopConf
 from .about import TopAbout
 from data.utilities import find_with_glob
-from tkinter import PhotoImage
-from os.path import join
 
 
 # NOTE: Tk is Windows in this Project.
