@@ -1,44 +1,14 @@
-# Introduction
+# SimpleT - Translating without complications
 
-Open Translation Alias OT un traductor abierto a todas las personas la intención
-de este traductor es brindar la experiencia de cualquer traductor web pero
-en tu escritorio parece un cliche dado que OT necesita internet para su
-funcionamiento, debido a este defecto OT proporciona (Proporcionara !) la
-posibilidad de traducir archivos no como ya lo hace sino de manera inteligente
-para una mayor comodidad.
+## Introduction
 
-## OT O Un Traductor En Linea
+This is a monumental improvement of my "Open Translation"* application, sometimes I don't want to open my browser to translate a small text, but at the same time I want different interpretations, listen to the pronunciation and have that data stored locally for later use. SimpleT is the solution to that.
 
-La respuesta es OT debido a que cualquier navegador es más pesado que OT (y más
-lento), OT posee una url a la cual se conecta por defecto pero esta se puede
-personalisar.
-
-## Me Es Util OT
-
-La respuesta es si, dependien de sí entras en la siguente lista:
-
-* Tengo mucha información que traducir y mi navegador no es la mejor
-    herramienta para ello.
-
-* Me molesta tener que abrir mi navegador solo para traducir algo.
-
-* Quiero un traductor que guarde todo lo que yo tradusca.
-
-* Quiero un traductor personalisable.
-
-* Quiero un traductor de software libre.
-
-* Ningúna de las anteriores pero OT me es util por algún motivo.
-
-## A Tener En Cuenta
-
-Open Translation todabia no a llegado a su primera version beta por lo cual
-podrian existir errores en el además el futuro de este es ser un traductor
-inteligente, de modo que se puedan traducir archivos complejos en el, tener una
-extención de traducción por voz, guardado inteligente; una mejor interfas
-grafica.
+* This repository used to be called "Open Translation".
 
 ## Requirements
 
-Python 3.8 or later with modules requests >= (2.23.0), tkinter >= (8.6),
-yaml (recommend ultimate version).
+* [Python 3.10](https://www.python.org/) or later with the packages:
+  * [gTTS](https://pypi.org/project/gTTS/).
+  * [deep-translator](https://pypi.org/project/deep-translator/).
+* [Electron 19.0](https://www.electronjs.org/) or later. For the graphics interface which will soon be available.
