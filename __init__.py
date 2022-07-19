@@ -2,12 +2,12 @@
 
 from hashlib import sha256 as Sha256
 from gtts import gTTS
-from os import path as fs 
-from base import DataBase
+from os import path as fs
+from simplet.base import DataBase
 from deep_translator.engines import __engines__ as engines
 
 # App version
-__version__ = '0.0.9' 
+__version__ = '0.0.10' 
 
 # Translate a "text" from a "source" language into a "target" language using
 # one of the available translators ("engine").
@@ -43,7 +43,7 @@ def main(text: str, translator: str, source: str, target: str) -> dict:
     if not fs.isdir(registry_dir):
         initiaize_database = True
         fs.os.makedirs(registry_dir)
-
+    
     with DataBase(fs.join(registry_dir, 'registry.db')) as registry:
         if initiaize_database:
             registry.initialize()

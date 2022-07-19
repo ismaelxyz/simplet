@@ -1,0 +1,28 @@
+[package]
+name = "simplet-gui"
+version = "0.1.0"
+authors = ["@asraelxyz <ismaelbeli.com@gmail.com>"]
+license = "MIT"
+edition = "2021"
+description = "Gui for SimpleT Application"
+repository  = "https://github.com/ismaelxyz/simplet.git"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+eframe = "*"
+# serde = { version = "1", optional = true, features = ["derive"] }
+
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "*"
+web-sys = { version = "*", features = [
+  'Document', 'Element', 'HtmlElement', 'Node', 'Window'
+]}
+
+# js-sys = "0.3"
+# wasm-bindgen-futures

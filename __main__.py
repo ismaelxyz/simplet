@@ -6,7 +6,7 @@
 
 import click
 from sys import stdout
-import main as simplet
+import simplet.main as simplet
 from json import dump as json_dump
 
 # Click settings
