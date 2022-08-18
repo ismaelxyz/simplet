@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-type" />
+  <title> SimpleT </title>
+  <link rel="shortcut icon"  type="image/svg+xml" href="./icons/simplet.svg">
+</head>
+<body>
+  <canvas id="app-canvas">
+    <!-- 
+      Full content is here (from Rust).
+      The id is important!
+    --> 
+  </canvas>
+  
+  <style>
+    body {
+      padding: 0px;
+      margin: 0px;
+      background-color: rgba(20, 10, 220, 0.5);
+    }
+
+    footer {
+      text-align: center;
+      background-color: transparent;
+      width: 100%;
+      padding: 10px 0px;
+    }
+  </style>
+
+  <script>
+    // The `--no-modules`-generated JS from `wasm-bindgen` attempts to use
+    // `WebAssembly.instantiateStreaming` to instantiate the wasm module,
+    // but this doesn't work with `file://` urls. This example is frequently
+    // viewed by simply opening `index.html` in a browser (with a `file://`
+    // url), so it would fail if we were to call this function!
+    //
+    // Work around this for now by deleting the function to ensure that the
+    // `no_modules.js` script doesn't have access to it. You won't need this
+    // hack when deploying over HTTP.
+    delete WebAssembly.instantiateStreaming;
+  </script>
+  
+  <script type="module">
+    // Call to Rust for display content.
+    
+    import init, { display } from "./pkg/simplet_gui.js"
+    
+    async function run() {
+      await init();
+      
+      display("app-canvas");
+    }
+    
+    run();
+  </script>
+
+  <footer> 
+    <img src="./icons/simplet.svg" width="100">
+    <p>Copyright &copy; 2022 <small> @asraelxyz </small>, All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>

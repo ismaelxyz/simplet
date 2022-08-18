@@ -1,5 +1,6 @@
+use crate::menu::Setting;
 use eframe::egui;
-use egui::{text::LayoutJob, vec2};
+//use egui::vec2; // text::LayoutJob,
 // use egui::util::cache::FrameCache;
 
 // theme: &CodeTheme, code: &str, language: &str
@@ -17,9 +18,10 @@ type VoidCache = egui::util::cache::FrameCache<LayoutJob, ()>;
 let mut memory = ctx.memory();
 let highlight_cache = memory.caches.cache::<VoidCache>();
 highlight_cache.get(())
-*/
+
 //    LayoutJob::default()
 //}
+
 
 pub const LOREM_IPSUM_LONG: &str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -56,60 +58,60 @@ impl LanguageSelect {
                 });
             });
     }
-}
+}*/
+
+use crate::menu::Menu;
 
 pub struct App {
     text_source: String,
     text_target: String,
-    language_select: LanguageSelect,
+    menu: Menu,
 }
 
 impl Default for App {
     fn default() -> Self {
-        let mut language_select = LanguageSelect::default();
-        language_select.is_active = true;
+        let Setting {
+            text_source,
+            text_target,
+            ..
+        } = Setting::load().unwrap_or_default();
+
         Self {
-            text_source: String::new(),
-            text_target: String::new(),
-            language_select, //: LanguageSelect::default(),
+            text_source,
+            text_target,
+            menu: Menu::default(),
         }
     }
 }
 
 impl eframe::App for App {
+    fn on_exit(&mut self, _gl: &eframe::glow::Context) {
+        let mut setting = Setting::load().unwrap_or_default();
+        setting.text_source = self.text_source.to_owned();
+        setting.text_target = self.text_target.to_owned();
+        setting.save();
+    }
+
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         //egui::Window::new(self.about.name())
 
         let Self {
             text_source,
             text_target,
-            language_select,
+            menu,
         } = self;
 
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            ui.label("Hello World!");
-        });
-
-        egui::SidePanel::left("left_panel")
-            .resizable(true)
-            .default_width(150.0)
-            .width_range(80.0..=200.0)
-            .show(ctx, |ui| {
-                ui.vertical_centered(|ui| {
-                    ui.heading("Left Panel");
-                });
-
-                egui::ScrollArea::vertical().show(ui, |ui| {
-                    lorem_ipsum(ui);
-                });
-            });
-
+        menu.ui(ctx);
         egui::CentralPanel::default().show(ctx, |ui| {
+            // ui.add_space(10.0);
+
             ui.horizontal(|ui| {
+                ui.add_space(25.0);
+
                 // ui.label("Your name: ");
                 //ui.text_edit_singleline(&mut self.name);
 
-                language_select.show(ctx);
+                // $ language_select.show(ctx);
 
                 /*let mut layouter = |ui: &egui::Ui, _string: &str, wrap_width: f32| {
                     let mut layout_job: LayoutJob = memoized(ui.ctx());
@@ -123,13 +125,18 @@ impl eframe::App for App {
                         egui::TextEdit::multiline(text_source)
                             .font(egui::TextStyle::Monospace) // for cursor height
                             .hint_text("Sorce text")
-                            //.code_editor()
                             .desired_rows(20)
                             .lock_focus(true)
-                            //.desired_width(350.0)
+                            .desired_width(350.0)
                             //.layouter(&mut layouter)
                             .show(ui)
                     });
+
+                ui.add_space(10.0);
+
+                if ui.button("Swap").clicked() {
+                    std::mem::swap(text_source, text_target);
+                }
 
                 ui.add_space(10.0);
 
@@ -143,12 +150,11 @@ impl eframe::App for App {
                                 //.code_editor()
                                 .desired_rows(20)
                                 .lock_focus(false)
-                                //.desired_width(350.0) //.layouter(&mut layouter),
+                                .desired_width(350.0) //.layouter(&mut layouter),
                                 .show(ui)
                         });
                 });
             });
-
         });
     }
 }

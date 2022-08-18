@@ -1,4 +1,5 @@
 __pycache__
-target
-Cargo.lock
-/gui/build.rb
+/Cargo.lock
+/target
+/help.txt
+/log

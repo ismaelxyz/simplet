@@ -2,16 +2,19 @@
 
 import sqlite3
 
-# Database manager for translations
 class DataBase:
-
+    """
+        Database manager for translations
+    """
+    
     def __init__(self, database_path):
         self.is_close = False
         self.context = sqlite3.connect(database_path)
         self.cursor = self.context.cursor()
 
-    # Initialise the database if it is not yet ready
+    
     def initialize(self):
+        """ Initialise the database if it is not yet ready """
         self.cursor.execute("""
         CREATE TABLE translations (
             "hash" integer NOT NULL,
@@ -26,9 +29,11 @@ class DataBase:
     # def search_all(self):
     #     return self.cursor.execute("""SELECT * FROM translations""").fetchall()
 
-    # Search only directory, source_text and target_text in the Database based
-    # on the columns hash_record, source_lang, target_lang .
     def search(self, hash_registry, source_lang, target_lang):
+        """
+            Search only directory, source_text and target_text in the Database based
+            on the columns hash_record, source_lang, target_lang.
+        """
         search_result = self.cursor.execute("""
             SELECT directory, source_text, target_text FROM translations
             WHERE hash == ? AND source_lang == ? AND target_lang ==  ?
@@ -39,8 +44,11 @@ class DataBase:
 
         return search_result
 
-    # Add a new translation to the translation database.
+    
     def add_translation(self, hash_registry, source, target, text, translation):
+        """
+            Add a new translation to the translation database.
+        """
         self.cursor.execute(
             """INSERT INTO translations VALUES (?, ?, ?, NULL, ?, ?)""",
             (hash_registry, source, target, text, translation)

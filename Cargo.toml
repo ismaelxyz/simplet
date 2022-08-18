@@ -11,8 +11,10 @@ repository  = "https://github.com/ismaelxyz/simplet.git"
 crate-type = ["cdylib"]
 
 [dependencies]
-eframe = "*"
-# serde = { version = "1", optional = true, features = ["derive"] }
+eframe = { version = "*" } # , features = ["persistence"]
+serde_json = "*"
+serde = { version = "*", features = ["derive"] }
+image = { version = "*", default_features = false, features = ["png"]}
 
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

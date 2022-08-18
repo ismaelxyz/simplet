@@ -3,15 +3,17 @@
 from hashlib import sha256 as Sha256
 from gtts import gTTS
 from os import path as fs
-from simplet.base import DataBase
+from .base import DataBase
 from deep_translator.engines import __engines__ as engines
 
 # App version
 __version__ = '0.0.10' 
 
-# Translate a "text" from a "source" language into a "target" language using
-# one of the available translators ("engine").
 def translate(engine: str, source: str, target: str, text: str) -> str:
+    """
+        Translate a "text" from a "source" language into a "target" language using
+        one of the available translators ("engine").
+    """
     translator_class = engines.get(engine, None)
     if not translator_class:
         names      = list(engines.keys())
@@ -25,17 +27,23 @@ def translate(engine: str, source: str, target: str, text: str) -> str:
     translator  = translator_class(source=source, target=target)
     return translator.translate(text)
 
-# It converts the "text" of a given "language" into audio in mp3 format and
-# stores it in a "directory".
+
 def text_to_speech(directory: str, name_file: str, lang: str, text: str):
+    """
+        It converts the "text" of a given "language" into audio in mp3 format and
+        stores it in a "directory".
+    """
     speech = gTTS(text=text, lang=lang, slow=False, tld='com', lang_check=True)
     speech.save(fs.join(directory, name_file + '.mp3'))
 
-# Translates a "text" from "source" to "target", saves audios in "mp3" format
-# of the original and translated text in a specific folder, also returns the
-# path of the directory where the audios, the original text and the translated
-# text are located.
+
 def main(text: str, translator: str, source: str, target: str) -> dict:
+    """
+        Translates a "text" from "source" to "target", saves audios in "mp3" format
+        of the original and translated text in a specific folder, also returns the
+        path of the directory where the audios, the original text and the translated
+        text are located.
+    """
     hash_registry = Sha256(text.encode('utf-8')).hexdigest()
     registry_dir = fs.join(fs.expanduser('~'), '.simplet')
     initiaize_database = False
