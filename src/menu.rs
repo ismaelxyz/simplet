@@ -1,59 +1,10 @@
-use crate::engines::start as engines_start;
-use eframe::egui;
-use egui::{pos2, Id, ImageButton, Rect, Response, Sense, TextureHandle, Ui, Vec2};
-use std::io::Cursor;
+use crate::{
+    app::{image_button, BUTTON_SIZE},
+    engines::start as engines_start,
+    icons::menu::Images,
+};
+use eframe::egui::{self, pos2, Id, ImageButton, Rect, Response, Sense, Ui, Vec2};
 use std::{collections::HashMap, env::var as env_var, path::PathBuf};
-
-const BUTTON_SIZE: [f32; 2] = [20.0, 20.0];
-mod icons {
-    pub const DEACTIVE: &[u8] = include_bytes!("../icons/menu.png");
-    pub const HIDE: &[u8] = include_bytes!("../icons/hide_menu.png");
-    pub const CHANGE_LANGUAGE: &[u8] = include_bytes!("../icons/change_language.png");
-    pub const CHANGE_TRANSLATOR: &[u8] = include_bytes!("../icons/change_translator.png");
-    pub const ABOUT: &[u8] = include_bytes!("../icons/about_simplet.png");
-}
-
-fn texture_from_bytes(name: &str, bytes: &[u8], ctx: &egui::Context) -> TextureHandle {
-    let image = image::io::Reader::new(Cursor::new(bytes))
-        .with_guessed_format()
-        .unwrap()
-        .decode()
-        .unwrap();
-
-    let size = [image.width() as _, image.height() as _];
-    let image_buffer = image.to_rgba8();
-    let pixels = image_buffer.as_flat_samples();
-    let image = egui::ColorImage::from_rgba_unmultiplied(size, pixels.as_slice());
-
-    ctx.load_texture(name, image)
-}
-
-struct Images {
-    deactive: TextureHandle,
-    hide: TextureHandle,
-    change_language: TextureHandle,
-    change_translator: TextureHandle,
-    about_simplet: TextureHandle,
-}
-
-impl Images {
-    fn new(ctx: &egui::Context) -> Self {
-        use icons::*;
-
-        Images {
-            deactive: texture_from_bytes("icon-deactive", DEACTIVE, ctx),
-            hide: texture_from_bytes("icon-hide", HIDE, ctx),
-            change_language: texture_from_bytes("icon-change-language", CHANGE_LANGUAGE, ctx),
-            change_translator: texture_from_bytes("icon-change-translator", CHANGE_TRANSLATOR, ctx),
-            about_simplet: texture_from_bytes("icon-about", ABOUT, ctx),
-        }
-    }
-}
-
-fn image_button(is_select: bool, ui: &mut egui::Ui, image: &TextureHandle) -> egui::Response {
-    //ui.add_space(10.0);
-    ui.add_enabled(!is_select, ImageButton::new(image, BUTTON_SIZE))
-}
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
 struct Language {
@@ -170,18 +121,10 @@ fn switch(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
     response
 }
 
+#[derive(Default)]
 pub(crate) struct Menu {
     images: Option<Images>,
     pub(crate) active: Option<Setting>,
-}
-
-impl Default for Menu {
-    fn default() -> Self {
-        Menu {
-            images: None,
-            active: None,
-        }
-    }
 }
 
 impl Menu {

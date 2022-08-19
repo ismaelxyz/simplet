@@ -1,36 +1,61 @@
-use crate::menu::{Menu, Setting};
-use eframe::egui;
+use crate::{
+    icons::app::Images,
+    menu::{Menu, Setting},
+};
+use eframe::egui::{self, InnerResponse, Response, Ui};
+pub const BUTTON_SIZE: [f32; 2] = [20.0, 20.0];
+
+pub fn image_button(is_select: bool, ui: &mut Ui, image: &egui::TextureHandle) -> Response {
+    //ui.add_space(10.0);
+    ui.add_enabled(!is_select, egui::ImageButton::new(image, BUTTON_SIZE))
+}
+
+fn area(
+    name: &str,
+    images: &Images,
+    text: &mut String,
+    hint_text: &str,
+    ui: &mut Ui,
+) -> InnerResponse<()> {
+    ui.vertical(|ui| {
+        ui.horizontal(|ui| {
+            ui.scope(|ui| {
+                ui.spacing_mut().item_spacing.x = 10.0;
+                image_button(false, ui, &images.play).on_hover_text("Text to Speech");
+                image_button(false, ui, &images.document_save).on_hover_text("Save as…");
+            });
+        });
+
+        ui.push_id(format!("{}-area", name), |ui| {
+            egui::ScrollArea::vertical()
+                .min_scrolled_height(200.0)
+                .show(ui, |ui| {
+                    egui::TextEdit::multiline(text)
+                        .font(egui::TextStyle::Monospace)
+                        .hint_text(hint_text) // "Sorce text"
+                        .desired_rows(20)
+                        //.lock_focus(true)
+                        .desired_width(350.0)
+                        .show(ui)
+                });
+        });
+    })
+}
 
 #[derive(Default)]
 pub struct App {
     text_source: String,
     text_target: String,
-    menu: Option<Menu>,
+    once: Option<(Menu, Images)>,
 }
-
-// impl  for App {
-//     fn default() -> Self {
-//         let Setting {
-//             text_source,
-//             text_target,
-//             ..
-//         } = Setting::load().unwrap_or_default();
-
-//         Self {
-//             text_source,
-//             text_target,
-//             angle: std::f32::consts::TAU / 3.0,
-//             menu: Menu::default(),
-//         }
-//     }
-// }
 
 impl eframe::App for App {
     fn on_exit(&mut self, _gl: &eframe::glow::Context) {
         let mut setting = self
-            .menu
+            .once
             .take()
             .unwrap()
+            .0
             .active
             .take()
             .or_else(|| Setting::load().ok())
@@ -45,11 +70,11 @@ impl eframe::App for App {
         let Self {
             text_source,
             text_target,
-            menu,
+            once,
         } = self;
 
-        let mut var_menu = if let Some(menu) = menu.take() {
-            menu
+        let (mut menu, images) = if let Some((menu, images)) = once.take() {
+            (menu, images)
         } else {
             let setting = Setting::load().unwrap_or_default();
             *text_source = setting.text_source;
@@ -60,50 +85,32 @@ impl eframe::App for App {
                 ctx.set_visuals(egui::Visuals::light());
             }
 
-            Menu::default()
+            (Menu::default(), Images::new(ctx))
         };
 
-        var_menu.update(ctx, frame);
+        menu.update(ctx, frame);
         egui::CentralPanel::default().show(ctx, |ui| {
-            // egui::Align::Center
 
-            ui.horizontal(|ui| {
-                ui.add_space(20.0);
-                ui.spacing_mut().item_spacing.x = 20.0;
-                egui::ScrollArea::vertical()
-                    .min_scrolled_height(200.0)
-                    .show(ui, |ui| {
-                        egui::TextEdit::multiline(text_source)
-                            .font(egui::TextStyle::Monospace)
-                            .hint_text("Sorce text")
-                            .desired_rows(20)
-                            .lock_focus(true)
-                            .desired_width(350.0)
-                            .show(ui)
-                    });
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.horizontal(|ui| {
 
-                if ui.button("Swap").clicked() {
-                    std::mem::swap(text_source, text_target);
-                }
+                    area("source", &images, text_source, "Sorce text", ui);
 
-                ui.push_id("target-area", |ui| {
-                    egui::ScrollArea::vertical()
-                        .min_scrolled_height(200.0)
-                        .show(ui, |ui| {
-                            egui::TextEdit::multiline(text_target)
-                                .font(egui::TextStyle::Monospace)
-                                .hint_text("Target text")
-                                .desired_rows(20)
-                                .lock_focus(false)
-                                .desired_width(350.0)
-                                .show(ui)
-                        });
+                    ui.add_space(25.0);
+                    
+                    if ui.button("Swap").clicked() {
+                        std::mem::swap(text_source, text_target);
+                    }
+
+                    ui.add_space(25.0);
+
+
+                    area("target", &images, text_target, "Target text", ui);
+
                 });
-
-                ui.add_space(20.0);
             });
         });
 
-        menu.replace(var_menu);
+        once.replace((menu, images));
     }
 }

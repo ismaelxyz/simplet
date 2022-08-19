@@ -3,7 +3,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod app;
 mod engines;
+mod icons;
 mod menu;
+
 use app::App;
 
 fn load_icon(path: &std::path::Path) -> Option<eframe::IconData> {
