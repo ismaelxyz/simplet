@@ -7,14 +7,11 @@ mod menu;
 use app::App;
 
 fn load_icon(path: &std::path::Path) -> Option<eframe::IconData> {
-    let (rgba, width, height) = {
-        let image = image::open(path)
-            .expect("Failed to open icon path")
-            .into_rgba8();
-        let (width, height) = image.dimensions();
-        let rgba = image.into_raw();
-        (rgba, width, height)
-    };
+    let image = image::open(path)
+        .expect("Failed to open icon path")
+        .into_rgba8();
+    let (width, height) = image.dimensions();
+    let rgba = image.into_raw();
 
     Some(eframe::IconData {
         rgba,
