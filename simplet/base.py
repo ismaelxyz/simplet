@@ -31,8 +31,8 @@ class DataBase:
 
     def search(self, hash_registry, source_lang, target_lang):
         """
-            Search only directory, source_text and target_text in the Database based
-            on the columns hash_record, source_lang, target_lang.
+            Search only directory, source_text and target_text in the Database
+            based on the columns hash_record, source_lang, target_lang.
         """
         search_result = self.cursor.execute("""
             SELECT directory, source_text, target_text FROM translations

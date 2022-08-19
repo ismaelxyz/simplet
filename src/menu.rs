@@ -1,6 +1,7 @@
+use crate::engines::start as engines_start;
 use eframe::egui;
 use egui::{ImageButton, TextureHandle};
-use std::{env::var as env_var, path::PathBuf, process::Command};
+use std::{collections::HashMap, env::var as env_var, path::PathBuf};
 
 fn load_texture_from_path(path: &str, ctx: &egui::Context) -> TextureHandle {
     let image = image::io::Reader::open(path).unwrap().decode().unwrap();
@@ -44,19 +45,12 @@ struct Language {
     target: String,
     open: bool,
     #[serde(skip)]
-    alternatives: Vec<String>,
+    alternatives: HashMap<String, String>,
 }
 
 impl Language {
-    fn alternatives() -> Vec<String> {
-        vec![
-            "Deuch".to_string(),
-            "Italian".to_string(),
-            "Polan".to_string(),
-            "Japanese".to_string(),
-            "Chinesse".to_string(),
-            "Korean".to_string(),
-        ]
+    fn alternatives(engine: &str) -> HashMap<String, String> {
+        engines_start()[engine].clone()
     }
 }
 
@@ -67,7 +61,7 @@ impl Default for Language {
             source: "Spanish".to_string(),
             target: "English".to_string(),
             open: false,
-            alternatives: Self::alternatives(),
+            alternatives: Self::alternatives("Google"),
         }
     }
 }
@@ -82,24 +76,16 @@ struct Translator {
 
 impl Translator {
     fn alternatives() -> Vec<String> {
-        let output = Command::new("python3")
-            .args(["-m", "simplet", "--trs"])
-            .output()
-            .expect("Failed to execute command");
-
-        serde_json::from_str(&String::from_utf8(output.stdout).unwrap()).unwrap()
+        engines_start().into_keys().collect()
     }
 }
 
 impl Default for Translator {
     fn default() -> Self {
-        let mut alternatives = Translator::alternatives();
-        let current = alternatives.remove(0);
-
         Translator {
-            current,
+            current: "Google".to_string(),
             open: false,
-            alternatives,
+            alternatives: Translator::alternatives(),
         }
     }
 }
@@ -109,25 +95,10 @@ struct AboutSimplet {
     open: bool,
 }
 
-/*
-
-impl ToString for MenuState {
-    fn to_string(&self) -> String {
-        match self {
-            MenuState::Deactive => "Deactive",
-            MenuState::Active => "Active",
-            MenuState::Language(..) => "Language",
-            MenuState::Translator(..) => "Translator",
-            MenuState::AboutSimplet => "AboutSimplet",
-        }
-        .to_string()
-    }
-}*/
-
 #[derive(Default, Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
-pub struct Setting {
-    pub text_source: String,
-    pub text_target: String,
+pub(crate) struct Setting {
+    pub(crate) text_source: String,
+    pub(crate) text_target: String,
     language: Language,
     translator: Translator,
     about: AboutSimplet,
@@ -140,13 +111,12 @@ impl Setting {
             .join("setting.json")
     }
 
-    // (Language, Translator, AboutSimplet)
     pub fn load() -> Result<Self, String> {
         let source = std::fs::read_to_string(Setting::file()).map_err(|err| err.to_string())?;
         let mut this: Self = serde_json::from_str(&source).map_err(|err| err.to_string())?;
 
-        this.language.alternatives = Language::alternatives();
         this.translator.alternatives = Translator::alternatives();
+        this.language.alternatives = Language::alternatives(&this.translator.current);
 
         Ok(this)
     }
@@ -158,22 +128,10 @@ impl Setting {
 }
 
 #[derive(Default)]
-pub struct Menu {
+pub(crate) struct Menu {
     images: Option<Images>,
     active: Option<Setting>,
 }
-/*
-fn ui(&mut self, ui: &mut egui::Ui) {
-     let texture: &egui::TextureHandle = self.texture.get_or_insert_with(|| {
-         // Load the texture only once.
-         ui.ctx().load_texture("my-image", egui::ColorImage::example())
-     });
-     // Show the image:
-     ui.add(egui::Image::new(texture, texture.size_vec2()));
-     // Shorter version:
-     ui.image(texture, texture.size_vec2());
- }
-*/
 
 impl Menu {
     pub fn ui(&mut self, ctx: &egui::Context) {
@@ -184,137 +142,146 @@ impl Menu {
             self.images.as_mut().unwrap()
         };
 
-        self.active = match self.active.take() {
-            None => {
-                let mut active = None;
-                egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-                    ui.add_space(5.0);
-                    if ui
-                        .add(ImageButton::new(&images.deactive, [20.0, 20.0]))
-                        .clicked()
-                    {
-                        active = Some(Setting::load().unwrap_or_default());
-                    }
+        self.active = if let Some(Setting {
+            text_source,
+            text_target,
+            mut language,
+            mut translator,
+            mut about,
+        }) = self.active.take()
+        {
+            egui::Window::new("Change Language")
+                .vscroll(true)
+                .open(&mut language.open)
+                .show(ctx, |ui| {
+                    ui.horizontal(|ui| {
+                        ui.radio_value(&mut language.source_select, true, "Source");
+                        ui.radio_value(&mut language.source_select, false, "Target");
+                    });
 
-                    ui.add_space(5.0);
+                    ui.add_space(10.0);
+
+                    egui::Grid::new("button_grid1").show(ui, |ui| {
+                        let mut current = &mut language.source;
+                        if language.source_select {
+                            current = &mut language.target;
+                        }
+
+                        for (index, alternative) in language.alternatives.keys().enumerate() {
+                            ui.radio_value(current, alternative.to_string(), alternative);
+                            if (index + 1) % 4 == 0 {
+                                ui.end_row();
+                            }
+                        }
+                    });
                 });
 
-                active
-            }
-            Some(Setting {
-                text_source,
-                text_target,
-                mut language,
-                mut translator,
-                mut about,
-            }) => {
-                egui::Window::new("Change Language")
-                    .open(&mut language.open)
-                    .show(ctx, |ui| {
-                        ui.horizontal(|ui| {
-                            ui.radio_value(&mut language.source_select, true, "Source");
-                            ui.radio_value(&mut language.source_select, false, "Target");
-                        });
-
-                        ui.add_space(10.0);
-
-                        egui::Grid::new("button_grid1").show(ui, |ui| {
-                            let mut current = &mut language.source;
-                            if language.source_select {
-                                current = &mut language.target;
-                            }
-
-                            for (index, alternative) in language.alternatives.iter().enumerate() {
-                                ui.radio_value(current, alternative.to_string(), alternative);
-                                if (index + 1) % 4 == 0 {
-                                    ui.end_row();
-                                }
-                            }
-                        });
-                    });
-
-                egui::Window::new("Change Engine")
-                    .open(&mut translator.open)
-                    .show(ctx, |ui| {
-                        egui::Grid::new("button_grid0").show(ui, |ui| {
-                            for (index, alternative) in translator.alternatives.iter().enumerate() {
-                                ui.radio_value(
+            egui::Window::new("Change Engine")
+                .open(&mut translator.open)
+                .show(ctx, |ui| {
+                    egui::Grid::new("button_grid0").show(ui, |ui| {
+                        for (index, alternative) in translator.alternatives.iter().enumerate() {
+                            if ui
+                                .radio_value(
                                     &mut translator.current,
                                     alternative.to_string(),
-                                    &*alternative,
-                                );
-                                if (index + 1) % 4 == 0 {
-                                    ui.end_row();
+                                    alternative,
+                                )
+                                .clicked()
+                            {
+                                language.alternatives = Language::alternatives(alternative);
+                                let mut keys = language.alternatives.keys();
+                                if !language.alternatives.contains_key(&language.source) {
+                                    language.source = keys.next().cloned().unwrap();
+                                }
+                                if !language.alternatives.contains_key(&language.target) {
+                                    language.target = keys.next().cloned().unwrap();
                                 }
                             }
-                        });
+                            if (index + 1) % 4 == 0 {
+                                ui.end_row();
+                            }
+                        }
                     });
+                });
 
-                egui::Window::new("About")
-                    .open(&mut about.open)
-                    .show(ctx, |ui| {
-                        ui.vertical_centered(|ui| {
-                            ui.label("SimpleT");
+            egui::Window::new("About")
+                .open(&mut about.open)
+                .show(ctx, |ui| {
+                    ui.vertical_centered(|ui| {
+                        ui.label("SimpleT");
 
+                        ui.add_space(5.0);
+                        // BUG: horizontal_centered is not compatible with
+                        // vertical_centered
+                        ui.horizontal_wrapped(|ui| {
+                            ui.add_space(80.0);
+
+                            ui.hyperlink_to("View Source", "https://github.com/ismaelxyz/simplet");
                             ui.add_space(5.0);
-                            // BUG: horizontal_centered is not compatible with
-                            // vertical_centered
-                            ui.horizontal_wrapped(|ui| {
-                                ui.add_space(80.0);
-
-                                ui.hyperlink_to("View Source", "https://github.com/ismaelxyz");
-                                ui.add_space(5.0);
-                                ui.hyperlink_to("Author", "https://github.com/ismaelxyz");
-                                ui.add_space(5.0);
-                                ui.hyperlink_to("Donate", "https://github.com/ismaelxyz");
-                            });
-                            ui.add_space(10.0);
-
-                            ui.label("Copyright © 2022 Ismael Belisario, All Rights Reserved.");
+                            ui.hyperlink_to("Author", "https://t.me/asraelxyz");
+                            ui.add_space(5.0);
+                            // TODO: Dude, it is the link?
+                            ui.hyperlink_to("Donate", "https://algorithmssite.github.io");
                         });
+                        ui.add_space(10.0);
+
+                        ui.label("Copyright © 2022 Ismael Belisario, All Rights Reserved.");
                     });
+                });
 
-                let mut setting = Setting {
-                    text_source,
-                    text_target,
-                    language,
-                    translator,
-                    about,
-                };
+            let mut setting = Setting {
+                text_source,
+                text_target,
+                language,
+                translator,
+                about,
+            };
 
-                let mut active = Some(());
-                egui::SidePanel::left("left_panel")
-                    .resizable(true)
-                    .default_width(80.0)
-                    .width_range(80.0..=100.0)
-                    .show(ctx, |ui| {
-                        ui.vertical_centered(|ui| {
-                            if image_button(false, ui, &images.hide).clicked() {
-                                setting.save();
-                                active = None;
-                            }
+            let mut active = Some(());
+            egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
+                ui.add_space(5.0);
 
-                            if image_button(setting.language.open, ui, &images.change_language)
-                                .clicked()
-                            {
-                                setting.language.open = true;
-                            }
+                ui.horizontal(|ui| {
+                    if image_button(false, ui, &images.hide).clicked() {
+                        setting.save();
+                        active = None;
+                    }
 
-                            if image_button(setting.translator.open, ui, &images.change_translator)
-                                .clicked()
-                            {
-                                setting.translator.open = true;
-                            }
+                    if image_button(setting.language.open, ui, &images.change_language).clicked() {
+                        setting.language.open = true;
+                    }
 
-                            if image_button(setting.about.open, ui, &images.about_simplet).clicked()
-                            {
-                                setting.about.open = true;
-                            }
-                        });
-                    });
+                    if image_button(setting.translator.open, ui, &images.change_translator)
+                        .clicked()
+                    {
+                        setting.translator.open = true;
+                    }
 
-                active.map(|_| setting)
-            }
+                    if image_button(setting.about.open, ui, &images.about_simplet).clicked() {
+                        setting.about.open = true;
+                    }
+                });
+
+                ui.add_space(5.0);
+            });
+
+            active.map(|_| setting)
+        } else {
+            let mut active = None;
+            egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+                ui.add_space(5.0);
+                if ui
+                    .add(ImageButton::new(&images.deactive, [20.0, 20.0]))
+                    .clicked()
+                {
+                    active = Some(Setting::load().unwrap_or_default());
+                }
+
+                ui.add_space(5.0);
+            });
+
+            active
         };
     }
 }
