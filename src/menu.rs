@@ -1,16 +1,31 @@
 use crate::engines::start as engines_start;
 use eframe::egui;
-use egui::{ImageButton, TextureHandle};
+use egui::{pos2, Id, ImageButton, Rect, Response, Sense, TextureHandle, Ui, Vec2};
+use std::io::Cursor;
 use std::{collections::HashMap, env::var as env_var, path::PathBuf};
 
-fn load_texture_from_path(path: &str, ctx: &egui::Context) -> TextureHandle {
-    let image = image::io::Reader::open(path).unwrap().decode().unwrap();
+const BUTTON_SIZE: [f32; 2] = [20.0, 20.0];
+mod icons {
+    pub const DEACTIVE: &[u8] = include_bytes!("../icons/menu.png");
+    pub const HIDE: &[u8] = include_bytes!("../icons/hide_menu.png");
+    pub const CHANGE_LANGUAGE: &[u8] = include_bytes!("../icons/change_language.png");
+    pub const CHANGE_TRANSLATOR: &[u8] = include_bytes!("../icons/change_translator.png");
+    pub const ABOUT: &[u8] = include_bytes!("../icons/about_simplet.png");
+}
+
+fn texture_from_bytes(name: &str, bytes: &[u8], ctx: &egui::Context) -> TextureHandle {
+    let image = image::io::Reader::new(Cursor::new(bytes))
+        .with_guessed_format()
+        .unwrap()
+        .decode()
+        .unwrap();
+
     let size = [image.width() as _, image.height() as _];
     let image_buffer = image.to_rgba8();
     let pixels = image_buffer.as_flat_samples();
     let image = egui::ColorImage::from_rgba_unmultiplied(size, pixels.as_slice());
 
-    ctx.load_texture(path, image)
+    ctx.load_texture(name, image)
 }
 
 struct Images {
@@ -23,19 +38,21 @@ struct Images {
 
 impl Images {
     fn new(ctx: &egui::Context) -> Self {
+        use icons::*;
+
         Images {
-            deactive: load_texture_from_path("./icons/menu.png", ctx),
-            hide: load_texture_from_path("./icons/hide_menu.png", ctx),
-            change_language: load_texture_from_path("./icons/change_language.png", ctx),
-            change_translator: load_texture_from_path("./icons/change_translator.png", ctx),
-            about_simplet: load_texture_from_path("./icons/about_simplet.png", ctx),
+            deactive: texture_from_bytes("icon-deactive", DEACTIVE, ctx),
+            hide: texture_from_bytes("icon-hide", HIDE, ctx),
+            change_language: texture_from_bytes("icon-change-language", CHANGE_LANGUAGE, ctx),
+            change_translator: texture_from_bytes("icon-change-translator", CHANGE_TRANSLATOR, ctx),
+            about_simplet: texture_from_bytes("icon-about", ABOUT, ctx),
         }
     }
 }
 
 fn image_button(is_select: bool, ui: &mut egui::Ui, image: &TextureHandle) -> egui::Response {
     ui.add_space(10.0);
-    ui.add_enabled(!is_select, ImageButton::new(image, [20.0, 20.0]))
+    ui.add_enabled(!is_select, ImageButton::new(image, BUTTON_SIZE))
 }
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
@@ -127,19 +144,44 @@ impl Setting {
     }
 }
 
-#[derive(Default)]
 pub(crate) struct Menu {
     images: Option<Images>,
-    active: Option<Setting>,
+    pub(crate) active: Option<Setting>,
+}
+
+impl Default for Menu {
+    fn default() -> Self {
+        Menu {
+            images: None,
+            active: None,
+        }
+    }
 }
 
 impl Menu {
-    pub fn ui(&mut self, ctx: &egui::Context) {
-        let images = if let Some(images) = self.images.as_mut() {
+    fn close_button_ui(&self, ui: &mut Ui, rect: Rect) -> Response {
+        let button_size = Vec2::splat(ui.spacing().icon_width);
+        // calculated so that the icon is on the diagonal (if window padding
+        // is symmetrical)
+        let pad = (rect.height() - button_size.y) / 2.0;
+        let button_rect = Rect::from_min_size(
+            pos2(
+                rect.right() - pad - button_size.x,
+                rect.center().y - 0.5 * button_size.y,
+            ),
+            button_size,
+        );
+
+        close_button(ui, button_rect)
+    }
+
+    pub fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        let images = if let Some(images) = self.images.take() {
             images
         } else {
+            // Pos2
             self.images.replace(Images::new(ctx));
-            self.images.as_mut().unwrap()
+            self.images.take().unwrap()
         };
 
         self.active = if let Some(Setting {
@@ -243,7 +285,10 @@ impl Menu {
                 ui.add_space(5.0);
 
                 ui.horizontal(|ui| {
-                    if image_button(false, ui, &images.hide).clicked() {
+                    if ui
+                        .add(ImageButton::new(&images.hide, [20.0, 20.0]))
+                        .clicked()
+                    {
                         setting.save();
                         active = None;
                     }
@@ -264,6 +309,17 @@ impl Menu {
                 });
 
                 ui.add_space(5.0);
+
+                let Rect { mut min, mut max } = ctx.input().screen_rect();
+
+                min.y = 20.0;
+                min.x = max.x - 30.0;
+                max.x -= 20.0;
+                max.y = 30.0;
+
+                if self.close_button_ui(ui, Rect { min, max }).clicked() {
+                    frame.quit();
+                }
             });
 
             active.map(|_| setting)
@@ -272,7 +328,7 @@ impl Menu {
             egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
                 ui.add_space(5.0);
                 if ui
-                    .add(ImageButton::new(&images.deactive, [20.0, 20.0]))
+                    .add(ImageButton::new(&images.deactive, BUTTON_SIZE))
                     .clicked()
                 {
                     active = Some(Setting::load().unwrap_or_default());
@@ -283,5 +339,32 @@ impl Menu {
 
             active
         };
+
+        self.images = Some(images);
     }
+}
+
+/// Paints the "Close" button of the window and processes clicks on it.
+///
+/// The close button is just an `X` symbol painted by a current stroke
+/// for foreground elements (such as a label text).
+///
+/// # Parameters
+/// - `ui`:
+/// - `rect`: The rectangular area to fit the button in
+///
+/// Returns the result of a click on a button if it was pressed
+fn close_button(ui: &mut Ui, rect: Rect) -> Response {
+    let close_id = Id::new(1).with("window-close-button");
+    let response = ui.interact(rect, close_id, Sense::click());
+    ui.expand_to_include_rect(response.rect);
+
+    let visuals = ui.style().interact(&response);
+    let rect = rect.shrink(2.0).expand(visuals.expansion);
+    let stroke = visuals.fg_stroke;
+    ui.painter() // paints \
+        .line_segment([rect.left_top(), rect.right_bottom()], stroke);
+    ui.painter() // paints /
+        .line_segment([rect.right_top(), rect.left_bottom()], stroke);
+    response
 }
