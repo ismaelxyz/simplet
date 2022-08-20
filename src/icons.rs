@@ -11,6 +11,7 @@ pub(crate) mod menu {
     const CHANGE_LANGUAGE: &[u8] = include_bytes!("../icons/change_language.png");
     const CHANGE_TRANSLATOR: &[u8] = include_bytes!("../icons/change_translator.png");
     const ABOUT: &[u8] = include_bytes!("../icons/about_simplet.png");
+    const SWAP: &[u8] = include_bytes!("../icons/swap.png");
 
     pub(crate) struct Images {
         pub(crate) deactive: TextureHandle,
@@ -18,6 +19,7 @@ pub(crate) mod menu {
         pub(crate) change_language: TextureHandle,
         pub(crate) change_translator: TextureHandle,
         pub(crate) about_simplet: TextureHandle,
+        pub(crate) swap: TextureHandle,
     }
 
     impl Images {
@@ -32,6 +34,7 @@ pub(crate) mod menu {
                     ctx,
                 ),
                 about_simplet: texture_from_bytes("icon-about", ABOUT, ctx),
+                swap: texture_from_bytes("icon-swap", SWAP, ctx),
             }
         }
     }

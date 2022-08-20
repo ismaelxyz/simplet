@@ -144,7 +144,12 @@ impl Menu {
         close_button(ui, button_rect)
     }
 
-    pub fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    pub fn update(
+        &mut self,
+        text: (&mut String, &mut String),
+        ctx: &egui::Context,
+        frame: &mut eframe::Frame,
+    ) {
         let images = if let Some(images) = self.images.take() {
             images
         } else {
@@ -219,23 +224,21 @@ impl Menu {
 
             egui::Window::new("About")
                 .open(&mut about.open)
+                .resizable(false)
                 .show(ctx, |ui| {
                     ui.vertical_centered(|ui| {
-                        ui.label(format!("SimpleT - {}", env!("CARGO_PKG_VERSION")));
+                        ui.label(format!("SimpleT - v{}", env!("CARGO_PKG_VERSION")));
 
                         ui.add_space(15.0);
                         ui.hyperlink_to("Author", "https://t.me/asraelxyz");
                     });
 
                     ui.horizontal(|ui| {
-                        //ui.add_space(15.0);
-
                         ui.hyperlink_to("View Source", "https://github.com/ismaelxyz/simplet");
 
                         ui.with_layout(egui::Layout::top_down(egui::Align::RIGHT), |ui| {
                             // TODO: Dude, it is the link?
                             ui.hyperlink_to("Donate", "https://algorithmssite.github.io");
-                            //ui.add_space(15.0);
                         });
                     });
                     ui.add_space(40.0);
@@ -260,7 +263,7 @@ impl Menu {
 
                 ui.horizontal(|ui| {
                     if ui
-                        .add(ImageButton::new(&images.hide, [20.0, 20.0]))
+                        .add(ImageButton::new(&images.hide, BUTTON_SIZE))
                         .clicked()
                     {
                         setting.save();
@@ -281,6 +284,13 @@ impl Menu {
 
                     if image_button(setting.about.open, ui, &images.about_simplet).clicked() {
                         setting.about.open = true;
+                    }
+
+                    if ui
+                        .add(ImageButton::new(&images.swap, BUTTON_SIZE))
+                        .clicked()
+                    {
+                        std::mem::swap(text.0, text.1);
                     }
 
                     ui.label("Dark Theme: ");

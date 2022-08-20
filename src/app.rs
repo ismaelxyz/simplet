@@ -26,16 +26,18 @@ fn area(
             });
         });
 
+        ui.add_space(10.0);
+
         ui.push_id(format!("{}-area", name), |ui| {
             egui::ScrollArea::vertical()
-                .min_scrolled_height(200.0)
+                .min_scrolled_height(300.0)
                 .show(ui, |ui| {
                     egui::TextEdit::multiline(text)
                         .font(egui::TextStyle::Monospace)
                         .hint_text(hint_text) // "Sorce text"
                         .desired_rows(20)
                         //.lock_focus(true)
-                        .desired_width(350.0)
+                        .desired_width(f32::INFINITY)
                         .show(ui)
                 });
         });
@@ -88,25 +90,20 @@ impl eframe::App for App {
             (Menu::default(), Images::new(ctx))
         };
 
-        menu.update(ctx, frame);
+        menu.update((text_source, text_target), ctx, frame);
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.scope(|ui| {
+                ui.columns(2, |uis| {
+                    uis[0].horizontal(|ui| {
+                        area("source", &images, text_source, "Sorce text", ui);
+                        ui.add_space(10.0);
+                    });
 
-            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
-                ui.horizontal(|ui| {
-
-                    area("source", &images, text_source, "Sorce text", ui);
-
-                    ui.add_space(25.0);
-                    
-                    if ui.button("Swap").clicked() {
-                        std::mem::swap(text_source, text_target);
-                    }
-
-                    ui.add_space(25.0);
-
-
-                    area("target", &images, text_target, "Target text", ui);
-
+                    uis[1].horizontal(|ui| {
+                        ui.add_space(10.0);
+                        let mut dummy = text_target.clone();
+                        area("target", &images, &mut dummy, "Target text", ui);
+                    });
                 });
             });
         });
