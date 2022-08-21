@@ -2,14 +2,9 @@ use crate::{
     icons::app::Images,
     menu::{Menu, Setting},
 };
-use eframe::egui::{self, InnerResponse, Response, Ui};
-pub const BUTTON_SIZE: [f32; 2] = [20.0, 20.0];
+use eframe::egui::{self, InnerResponse, Ui};
 
-pub fn image_button(is_select: bool, ui: &mut Ui, image: &egui::TextureHandle) -> Response {
-    //ui.add_space(10.0);
-    ui.add_enabled(!is_select, egui::ImageButton::new(image, BUTTON_SIZE))
-}
-
+#[allow(clippy::ptr_arg)] // it not is true
 fn area(
     name: &str,
     images: &Images,
@@ -21,8 +16,10 @@ fn area(
         ui.horizontal(|ui| {
             ui.scope(|ui| {
                 ui.spacing_mut().item_spacing.x = 10.0;
-                image_button(false, ui, &images.play).on_hover_text("Text to Speech");
-                image_button(false, ui, &images.document_save).on_hover_text("Save as…");
+                ui.add(images.button("play"))
+                    .on_hover_text("Text to Speech");
+                ui.add(images.button("document-save"))
+                    .on_hover_text("Save as…");
             });
         });
 
@@ -51,6 +48,22 @@ pub struct App {
     once: Option<(Menu, Images)>,
 }
 
+impl App {
+    fn configure(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) -> (Menu, Images) {
+        let setting = Setting::load().unwrap_or_default();
+        self.text_source = setting.text_source;
+        self.text_target = setting.text_target;
+        frame.set_decorations(setting.decoration);
+        if setting.dark_theme {
+            ctx.set_visuals(egui::Visuals::dark());
+        } else {
+            ctx.set_visuals(egui::Visuals::light());
+        }
+
+        (Menu::default(), Images::app(ctx))
+    }
+}
+
 impl eframe::App for App {
     fn on_exit(&mut self, _gl: &eframe::glow::Context) {
         let mut setting = self
@@ -69,45 +82,29 @@ impl eframe::App for App {
     }
 
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self {
-            text_source,
-            text_target,
-            once,
-        } = self;
+        let (mut menu, images) = self
+            .once
+            .take()
+            .unwrap_or_else(|| self.configure(ctx, frame));
 
-        let (mut menu, images) = if let Some((menu, images)) = once.take() {
-            (menu, images)
-        } else {
-            let setting = Setting::load().unwrap_or_default();
-            *text_source = setting.text_source;
-            *text_target = setting.text_target;
-            if setting.dark_theme {
-                ctx.set_visuals(egui::Visuals::dark());
-            } else {
-                ctx.set_visuals(egui::Visuals::light());
-            }
-
-            (Menu::default(), Images::new(ctx))
-        };
-
-        menu.update((text_source, text_target), ctx, frame);
+        menu.update((&mut self.text_source, &mut self.text_target), ctx, frame);
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.scope(|ui| {
                 ui.columns(2, |uis| {
                     uis[0].horizontal(|ui| {
-                        area("source", &images, text_source, "Sorce text", ui);
+                        area("source", &images, &mut self.text_source, "Sorce text", ui);
                         ui.add_space(10.0);
                     });
 
                     uis[1].horizontal(|ui| {
                         ui.add_space(10.0);
-                        let mut dummy = text_target.clone();
-                        area("target", &images, &mut dummy, "Target text", ui);
+                        let dummy = &mut self.text_target.clone();
+                        area("target", &images, dummy, "Target text", ui);
                     });
                 });
             });
         });
 
-        once.replace((menu, images));
+        self.once.replace((menu, images));
     }
 }

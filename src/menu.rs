@@ -1,9 +1,5 @@
-use crate::{
-    app::{image_button, BUTTON_SIZE},
-    engines::start as engines_start,
-    icons::menu::Images,
-};
-use eframe::egui::{self, pos2, Id, ImageButton, Rect, Response, Sense, Ui, Vec2};
+use crate::{engines::start as engines_start, icons::menu::Images};
+use eframe::egui::{self, pos2, Align, Id, Layout, Ui};
 use std::{collections::HashMap, env::var as env_var, path::PathBuf};
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
@@ -68,6 +64,7 @@ pub(crate) struct Setting {
     pub(crate) text_source: String,
     pub(crate) text_target: String,
     pub(crate) dark_theme: bool,
+    pub(crate) decoration: bool,
     language: Language,
     translator: Translator,
     about: AboutSimplet,
@@ -96,7 +93,7 @@ impl Setting {
     }
 }
 
-fn switch(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
+fn switch(ui: &mut Ui, on: &mut bool) -> egui::Response {
     let desired_size = ui.spacing().interact_size.y * egui::vec2(2.0, 1.0);
     let (rect, mut response) = ui.allocate_exact_size(desired_size, egui::Sense::click());
     if response.clicked() {
@@ -113,7 +110,7 @@ fn switch(ui: &mut egui::Ui, on: &mut bool) -> egui::Response {
         ui.painter()
             .rect(rect, radius, visuals.bg_fill, visuals.bg_stroke);
         let circle_x = egui::lerp((rect.left() + radius)..=(rect.right() - radius), how_on);
-        let center = egui::pos2(circle_x, rect.center().y);
+        let center = pos2(circle_x, rect.center().y);
         ui.painter()
             .circle(center, 0.75 * radius, visuals.bg_fill, visuals.fg_stroke);
     }
@@ -128,40 +125,21 @@ pub(crate) struct Menu {
 }
 
 impl Menu {
-    fn close_button_ui(&self, ui: &mut Ui, rect: Rect) -> Response {
-        let button_size = Vec2::splat(ui.spacing().icon_width);
-        // calculated so that the icon is on the diagonal (if window padding
-        // is symmetrical)
-        let pad = (rect.height() - button_size.y) / 2.0;
-        let button_rect = Rect::from_min_size(
-            pos2(
-                rect.right() - pad - button_size.x,
-                rect.center().y - 0.5 * button_size.y,
-            ),
-            button_size,
-        );
-
-        close_button(ui, button_rect)
-    }
-
     pub fn update(
         &mut self,
         text: (&mut String, &mut String),
         ctx: &egui::Context,
         frame: &mut eframe::Frame,
     ) {
-        let images = if let Some(images) = self.images.take() {
-            images
-        } else {
-            // Pos2
-            self.images.replace(Images::new(ctx));
-            self.images.take().unwrap()
-        };
+        let response;
+        let images = self.images.take().unwrap_or_else(|| Images::menu(ctx));
+        let mut buttons = vec![];
 
         self.active = if let Some(Setting {
             text_source,
             text_target,
-            dark_theme,
+            mut dark_theme,
+            mut decoration,
             mut language,
             mut translator,
             mut about,
@@ -193,32 +171,69 @@ impl Menu {
                     });
                 });
 
-            egui::Window::new("Change Engine")
+            egui::Window::new("Setting")
                 .open(&mut translator.open)
                 .show(ctx, |ui| {
-                    egui::Grid::new("button_grid0").show(ui, |ui| {
-                        for (index, alternative) in translator.alternatives.iter().enumerate() {
-                            if ui
-                                .radio_value(
-                                    &mut translator.current,
-                                    alternative.to_string(),
-                                    alternative,
-                                )
-                                .clicked()
+                    egui::collapsing_header::CollapsingState::load_with_default_open(
+                        ui.ctx(),
+                        Id::new("collapsing"),
+                        true,
+                    )
+                    .show_header(ui, |ui| {
+                        // ...
+                        ui.label(format!("Change Engine - {}", &translator.current));
+                    })
+                    .body(|ui| {
+                        egui::Grid::new("button_grid0").show(ui, |ui| {
+                            let current = translator.current.clone();
+                            for (index, alt) in translator
+                                .alternatives
+                                .iter()
+                                .filter(|alt| current[..] != alt[..])
+                                .enumerate()
                             {
-                                language.alternatives = Language::alternatives(alternative);
-                                let mut keys = language.alternatives.keys();
-                                if !language.alternatives.contains_key(&language.source) {
-                                    language.source = keys.next().cloned().unwrap();
+                                if ui
+                                    .radio_value(&mut translator.current, alt.to_string(), alt)
+                                    .clicked()
+                                {
+                                    language.alternatives = Language::alternatives(alt);
+                                    let mut keys = language.alternatives.keys();
+                                    if !language.alternatives.contains_key(&language.source) {
+                                        language.source = keys.next().cloned().unwrap();
+                                    }
+                                    if !language.alternatives.contains_key(&language.target) {
+                                        language.target = keys.next().cloned().unwrap();
+                                    }
                                 }
-                                if !language.alternatives.contains_key(&language.target) {
-                                    language.target = keys.next().cloned().unwrap();
+
+                                if (index + 1) % 4 == 0 {
+                                    ui.end_row();
                                 }
                             }
-                            if (index + 1) % 4 == 0 {
-                                ui.end_row();
+                        });
+                    });
+
+                    ui.add_space(20.);
+
+                    ui.horizontal(|ui| {
+                        ui.add_space(10.);
+                        ui.spacing_mut().item_spacing.x = 10.0;
+
+                        ui.label("Dark Theme: ");
+                        if switch(ui, &mut dark_theme).clicked() {
+                            if dark_theme {
+                                ctx.set_visuals(egui::Visuals::dark());
+                            } else {
+                                ctx.set_visuals(egui::Visuals::light());
                             }
                         }
+
+                        ui.add_space(10.);
+                        ui.label("Window Decoration: ");
+                        if switch(ui, &mut decoration).clicked() {
+                            frame.set_decorations(decoration);
+                        }
+                        ui.add_space(10.);
                     });
                 });
 
@@ -236,7 +251,7 @@ impl Menu {
                     ui.horizontal(|ui| {
                         ui.hyperlink_to("View Source", "https://github.com/ismaelxyz/simplet");
 
-                        ui.with_layout(egui::Layout::top_down(egui::Align::RIGHT), |ui| {
+                        ui.with_layout(Layout::top_down(Align::RIGHT), |ui| {
                             // TODO: Dude, it is the link?
                             ui.hyperlink_to("Donate", "https://algorithmssite.github.io");
                         });
@@ -252,83 +267,85 @@ impl Menu {
                 text_source,
                 text_target,
                 dark_theme,
+                decoration,
                 language,
                 translator,
                 about,
             };
 
             let mut active = Some(());
-            egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
+
+            response = egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
                 ui.add_space(5.0);
 
                 ui.horizontal(|ui| {
-                    if ui
-                        .add(ImageButton::new(&images.hide, BUTTON_SIZE))
-                        .clicked()
-                    {
+                    buttons = vec![
+                        ui.add(images.button("menu-hide")),
+                        images.add_button(ui, setting.language.open, "change-language"),
+                        images.add_button(ui, setting.translator.open, "settings"),
+                        images.add_button(ui, setting.about.open, "about-simplet"),
+                        ui.add(images.button("swap")),
+                    ];
+
+                    if buttons[0].clicked() {
                         setting.save();
                         active = None;
                     }
 
                     ui.spacing_mut().item_spacing.x = 10.0;
 
-                    if image_button(setting.language.open, ui, &images.change_language).clicked() {
+                    if buttons[1].clicked() {
                         setting.language.open = true;
                     }
 
-                    if image_button(setting.translator.open, ui, &images.change_translator)
-                        .clicked()
-                    {
+                    if buttons[2].clicked() {
                         setting.translator.open = true;
                     }
 
-                    if image_button(setting.about.open, ui, &images.about_simplet).clicked() {
+                    if buttons[3].clicked() {
                         setting.about.open = true;
                     }
 
-                    if ui
-                        .add(ImageButton::new(&images.swap, BUTTON_SIZE))
-                        .clicked()
-                    {
+                    if buttons[4].clicked() {
                         std::mem::swap(text.0, text.1);
                     }
 
-                    ui.label("Dark Theme: ");
-                    let old = setting.dark_theme;
-                    switch(ui, &mut setting.dark_theme);
+                    let mut center_x = (ui.available_width() - buttons[4].rect.max.x - 43.5) / 2.0;
 
-                    if old != setting.dark_theme {
-                        if setting.dark_theme {
-                            ctx.set_visuals(egui::Visuals::dark());
-                        } else {
-                            ctx.set_visuals(egui::Visuals::light());
-                        }
+                    if center_x < 0.0 {
+                        center_x = 0.0;
                     }
+
+                    ui.add_space(center_x);
+                    ui.label("SimpleT");
+
+                    ui.with_layout(Layout::right_to_left(), |ui| {
+                        buttons.append(&mut vec![
+                            ui.add(images.button("window-close")),
+                            ui.add(images.button("window-minimize")),
+                        ]);
+
+                        if buttons[5].clicked() {
+                            frame.quit();
+                        }
+
+                        if buttons[6].clicked() {
+                            frame.output.window_pos = None;
+                        }
+                    });
                 });
 
                 ui.add_space(5.0);
-
-                let Rect { mut min, mut max } = ctx.input().screen_rect();
-
-                min.y = 20.0;
-                min.x = max.x - 30.0;
-                max.x -= 20.0;
-                max.y = 30.0;
-
-                if self.close_button_ui(ui, Rect { min, max }).clicked() {
-                    frame.quit();
-                }
             });
 
             active.map(|_| setting)
         } else {
             let mut active = None;
-            egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            response = egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
                 ui.add_space(5.0);
-                if ui
-                    .add(ImageButton::new(&images.deactive, BUTTON_SIZE))
-                    .clicked()
-                {
+                buttons = vec![ui.add(images.button("menu"))];
+
+                if buttons[0].clicked() {
                     active = Some(Setting::load().unwrap_or_default());
                 }
 
@@ -338,31 +355,10 @@ impl Menu {
             active
         };
 
+        if !buttons.iter().any(|btn| btn.hovered()) && response.response.hovered() {
+            frame.drag_window();
+        }
+
         self.images = Some(images);
     }
-}
-
-/// Paints the "Close" button of the window and processes clicks on it.
-///
-/// The close button is just an `X` symbol painted by a current stroke
-/// for foreground elements (such as a label text).
-///
-/// # Parameters
-/// - `ui`:
-/// - `rect`: The rectangular area to fit the button in
-///
-/// Returns the result of a click on a button if it was pressed
-fn close_button(ui: &mut Ui, rect: Rect) -> Response {
-    let close_id = Id::new(1).with("window-close-button");
-    let response = ui.interact(rect, close_id, Sense::click());
-    ui.expand_to_include_rect(response.rect);
-
-    let visuals = ui.style().interact(&response);
-    let rect = rect.shrink(2.0).expand(visuals.expansion);
-    let stroke = visuals.fg_stroke;
-    ui.painter() // paints \
-        .line_segment([rect.left_top(), rect.right_bottom()], stroke);
-    ui.painter() // paints /
-        .line_segment([rect.right_top(), rect.left_bottom()], stroke);
-    response
 }
