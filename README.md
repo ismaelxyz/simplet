@@ -1,7 +1,6 @@
 # SimpleT Gui
 
-Una interfaz gráfica de usuario para la aplicación [SimpleT](https://github.com/ismaelxyz/simplet/),
-su dependencia principal [eframe ](https://github.com/emilk/egui) (egui realmente) permite usar el entorno web y el de escritorio sin dejar de utilizar Rust.
+A graphical user interface for the [SimpleT](https://github.com/ismaelxyz/simplet/) application, its main dependency [eframe ](https://github.com/emilk/egui) (egui actually) allows to use both the web and desktop environment while still using Rust.
 
 ## Build Native
 ```sh
