@@ -11,7 +11,7 @@ repository  = "https://github.com/ismaelxyz/simplet.git"
 crate-type = ["cdylib"]
 
 [dependencies]
-eframe = { version = "*" } # , features = ["persistence"]
+eframe = { version = "*", features = ["persistence"] } # , 
 serde_json = "*"
 serde = { version = "*", features = ["derive"] }
 image = { version = "*", default_features = false, features = ["png"]}
