@@ -11,6 +11,7 @@ cargo build --release --bin simplet-gui
 
 ```sh
 # cargo install wasm-pack # for install crate wasm-pack and work with WASM
-wasm-pack build . -t web --release
+cargo build --release --lib --target wasm32-unknown-unknown
+wasm-bindgen ./target/wasm32-unknown-unknown/release/simplet_gui.wasm --out-dir public/wasm --target web --no-typescript
 ```
 

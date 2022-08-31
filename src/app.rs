@@ -1,5 +1,5 @@
 use crate::{
-    icons::app::Images,
+    icons::Images,
     menu::{Menu, Setting},
 };
 use eframe::egui::{self, InnerResponse, Ui};
@@ -49,11 +49,12 @@ pub struct App {
 }
 
 impl App {
-    fn configure(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) -> (Menu, Images) {
+    fn configure(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) -> (Menu, Images) {
         let setting = Setting::load().unwrap_or_default();
         self.text_source = setting.text_source;
         self.text_target = setting.text_target;
-        frame.set_decorations(setting.decoration);
+        #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
+        _frame.set_decorations(setting.decoration);
         if setting.dark_theme {
             ctx.set_visuals(egui::Visuals::dark());
         } else {
@@ -65,7 +66,8 @@ impl App {
 }
 
 impl eframe::App for App {
-    fn on_exit(&mut self, _gl: &eframe::glow::Context) {
+    
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         let mut setting = self
             .once
             .take()

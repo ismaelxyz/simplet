@@ -21,7 +21,11 @@ pub fn start() -> Result<(), JsValue> {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub fn display(canvas_id: &str) -> Result<(), JsValue> {
-    eframe::start_web(canvas_id, Box::new(|_cc| Box::new(App::default())))
+    eframe::start_web(
+        canvas_id,
+        eframe::WebOptions::default(),
+        Box::new(|_cc| Box::new(App::default())),
+    )
+    .unwrap();
+    Ok(())
 }
-
-// wasm-pack build . -t web -- --release

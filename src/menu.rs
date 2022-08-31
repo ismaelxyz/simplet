@@ -1,4 +1,4 @@
-use crate::{engines::start as engines_start, icons::menu::Images};
+use crate::{engines::start as engines_start, icons::Images};
 use eframe::egui::{self, pos2, Align, Id, Layout, Ui};
 use std::{collections::HashMap, env::var as env_var, path::PathBuf};
 
@@ -64,6 +64,7 @@ pub(crate) struct Setting {
     pub(crate) text_source: String,
     pub(crate) text_target: String,
     pub(crate) dark_theme: bool,
+    #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
     pub(crate) decoration: bool,
     language: Language,
     translator: Translator,
@@ -72,19 +73,19 @@ pub(crate) struct Setting {
 
 impl Setting {
     fn file() -> PathBuf {
-        PathBuf::from(env_var("HOME").or_else(|_| env_var("HOMEPATH")).unwrap())
+        PathBuf::from(env_var("HOME").or_else(|_| env_var("HOMEPATH")).unwrap_or_default())
             .join(".simplet")
             .join("setting.json")
     }
 
     pub fn load() -> Result<Self, String> {
-        let source = std::fs::read_to_string(Setting::file()).map_err(|err| err.to_string())?;
-        let mut this: Self = serde_json::from_str(&source).map_err(|err| err.to_string())?;
+        // let source = std::fs::read_to_string(Setting::file()).map_err(|err| err.to_string())?;
+        // let mut this: Self = serde_json::from_str(&source).map_err(|err| err.to_string())?;
 
-        this.translator.alternatives = Translator::alternatives();
-        this.language.alternatives = Language::alternatives(&this.translator.current);
+        // this.translator.alternatives = Translator::alternatives();
+        // this.language.alternatives = Language::alternatives(&this.translator.current);
 
-        Ok(this)
+        Ok(Self::default()) //
     }
 
     pub fn save(&self) {
@@ -129,9 +130,9 @@ impl Menu {
         &mut self,
         text: (&mut String, &mut String),
         ctx: &egui::Context,
-        frame: &mut eframe::Frame,
+        _frame: &mut eframe::Frame,
     ) {
-        let response;
+        let _response;
         let images = self.images.take().unwrap_or_else(|| Images::menu(ctx));
         let mut buttons = vec![];
 
@@ -139,6 +140,7 @@ impl Menu {
             text_source,
             text_target,
             mut dark_theme,
+            #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
             mut decoration,
             mut language,
             mut translator,
@@ -229,11 +231,15 @@ impl Menu {
                         }
 
                         ui.add_space(10.);
-                        ui.label("Window Decoration: ");
-                        if switch(ui, &mut decoration).clicked() {
-                            frame.set_decorations(decoration);
+
+                        #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
+                        {
+                            ui.label("Window Decoration: ");
+                            if switch(ui, &mut decoration).clicked() {
+                                frame.set_decorations(decoration);
+                            }
+                            ui.add_space(10.);
                         }
-                        ui.add_space(10.);
                     });
                 });
 
@@ -267,6 +273,7 @@ impl Menu {
                 text_source,
                 text_target,
                 dark_theme,
+                #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
                 decoration,
                 language,
                 translator,
@@ -275,7 +282,7 @@ impl Menu {
 
             let mut active = Some(());
 
-            response = egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
+            _response = egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
                 ui.add_space(5.0);
 
                 ui.horizontal(|ui| {
@@ -310,27 +317,33 @@ impl Menu {
                         std::mem::swap(text.0, text.1);
                     }
 
-                    let mut center_x = (ui.available_width() - buttons[4].rect.max.x - 43.5) / 2.0;
+                    #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
+                    {
+                        let mut center_x =
+                            (ui.available_width() - buttons[4].rect.max.x - 43.5) / 2.0;
 
-                    if center_x < 0.0 {
-                        center_x = 0.0;
+                        if center_x < 0.0 {
+                            center_x = 0.0;
+                        }
+
+                        ui.add_space(center_x);
+                        ui.label("SimpleT");
                     }
 
-                    ui.add_space(center_x);
-                    ui.label("SimpleT");
-
-                    ui.with_layout(Layout::right_to_left(), |ui| {
+                    #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
+                    ui.with_layout(Layout::right_to_left(Align::LEFT), |ui| {
                         buttons.append(&mut vec![
                             ui.add(images.button("window-close")),
                             ui.add(images.button("window-minimize")),
                         ]);
 
                         if buttons[5].clicked() {
-                            frame.quit();
+                            frame.close();
                         }
 
                         if buttons[6].clicked() {
-                            frame.output.window_pos = None;
+                            //frame.set_visible(false);
+                            //frame.output.window_pos = None;
                         }
                     });
                 });
@@ -341,7 +354,7 @@ impl Menu {
             active.map(|_| setting)
         } else {
             let mut active = None;
-            response = egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            _response = egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
                 ui.add_space(5.0);
                 buttons = vec![ui.add(images.button("menu"))];
 
@@ -355,7 +368,8 @@ impl Menu {
             active
         };
 
-        if !buttons.iter().any(|btn| btn.hovered()) && response.response.hovered() {
+        #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
+        if !buttons.iter().any(|btn| btn.hovered()) && _response.response.hovered() {
             frame.drag_window();
         }
 

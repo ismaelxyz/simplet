@@ -5,7 +5,6 @@ mod app;
 mod engines;
 mod icons;
 mod menu;
-
 use app::App;
 
 fn load_icon(path: &std::path::Path) -> Option<eframe::IconData> {
@@ -30,5 +29,3 @@ fn main() {
     };
     eframe::run_native("SimpleT", options, Box::new(|_cc| Box::new(App::default())));
 }
-
-// cargo build --release --bin simplet-gui
