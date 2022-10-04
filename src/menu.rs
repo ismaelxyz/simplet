@@ -73,9 +73,13 @@ pub(crate) struct Setting {
 
 impl Setting {
     fn file() -> PathBuf {
-        PathBuf::from(env_var("HOME").or_else(|_| env_var("HOMEPATH")).unwrap_or_default())
-            .join(".simplet")
-            .join("setting.json")
+        PathBuf::from(
+            env_var("HOME")
+                .or_else(|_| env_var("HOMEPATH"))
+                .unwrap_or_default(),
+        )
+        .join(".simplet")
+        .join("setting.json")
     }
 
     pub fn load() -> Result<Self, String> {

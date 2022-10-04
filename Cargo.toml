@@ -15,8 +15,9 @@ eframe = { version = "*", features = ["persistence"] } # ,
 serde_json = "*"
 serde = { version = "*", features = ["derive"] }
 image = { version = "*", default_features = false, features = ["png"]}
-# rfd        = "*" # file_dialog
-
+rfd   = "*" # file_dialog
+#pyo3  = { version = "*", features = [] }
+# "auto-initialize"
 # [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 
 

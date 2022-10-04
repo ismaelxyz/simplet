@@ -18,8 +18,22 @@ fn area(
                 ui.spacing_mut().item_spacing.x = 10.0;
                 ui.add(images.button("play"))
                     .on_hover_text("Text to Speech");
-                ui.add(images.button("document-save"))
-                    .on_hover_text("Save as…");
+                if ui
+                    .add(images.button("document-save"))
+                    .on_hover_text("Save as…")
+                    .clicked()
+                {
+                    let path = std::env::current_dir().unwrap();
+
+                    let file_to_save = rfd::FileDialog::new()
+                        .set_file_name(&(hint_text.replace(" ", "-").to_lowercase() + ".txt"))
+                        .set_directory(&path)
+                        .save_file();
+
+                    if let Some(absolute_path) = file_to_save {
+                        std::fs::write(absolute_path, &*text).unwrap();
+                    }
+                }
             });
         });
 
@@ -66,7 +80,6 @@ impl App {
 }
 
 impl eframe::App for App {
-    
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         let mut setting = self
             .once
