@@ -93,8 +93,8 @@ impl Setting {
     }
 
     pub fn save(&self) {
-        let string = serde_json::to_string(&self).unwrap();
-        std::fs::write(Setting::file(), &string).unwrap();
+        let data = serde_json::to_string(&self).unwrap();
+        std::fs::write(Setting::file(), data).unwrap();
     }
 }
 

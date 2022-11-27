@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 1122.5197 793.70081"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   sodipodi:docname="disegno.svg"
+   inkscape:export-filename="disegno.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title3140">Uovo da Stella</title>
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.49640873"
+     inkscape:cx="522.75471"
+     inkscape:cy="398.86486"
+     inkscape:window-width="1024"
+     inkscape:window-height="560"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer5" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2374">
+      <stop
+         style="stop-color:#e3f078;stop-opacity:0.85569263;"
+         offset="0.03880054"
+         id="stop2370" />
+      <stop
+         style="stop-color:#f5f6b6;stop-opacity:0.91878802;"
+         offset="1"
+         id="stop2372" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2374"
+       id="radialGradient2376"
+       cx="459.42816"
+       cy="307.70062"
+       fx="459.42816"
+       fy="307.70062"
+       r="165.71303"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter2378"
+       x="-0.093890054"
+       y="-0.093890054"
+       width="1.1877801"
+       height="1.1877801">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="12.343893"
+         id="feGaussianBlur2380" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter2405"
+       x="-0.12431285"
+       y="-0.1359634"
+       width="1.2486257"
+       height="1.2719268">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="4.0808452"
+         id="feGaussianBlur2407" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter2409"
+       x="-0.073415855"
+       y="-0.11906991"
+       width="1.1468317"
+       height="1.2381398">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="12.231918"
+         id="feGaussianBlur2411" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter3012"
+       x="-0.0022962292"
+       y="-0.0037241521"
+       width="1.0045925"
+       height="1.0074483">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.38257796"
+         id="feGaussianBlur3014" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <ellipse
+       style="display:none;fill:#333333;stroke-width:1.58504"
+       id="path184-6"
+       cx="569.3316"
+       cy="488.36765"
+       rx="199.61874"
+       ry="181.53841"
+       inkscape:label="path184" />
+    <ellipse
+       style="display:none;fill:#808080;stroke-width:1.58504"
+       id="path184"
+       cx="564.4071"
+       cy="463.26407"
+       rx="199.61874"
+       ry="181.53841"
+       inkscape:label="path184" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 2"
+     style="display:inline">
+    <ellipse
+       style="display:none;fill:#ffffff;stroke-width:1.58504"
+       id="path184-3"
+       cx="551.96454"
+       cy="396.8504"
+       rx="199.61874"
+       ry="181.53841" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Layer 3"
+     style="display:inline">
+    <path
+       sodipodi:type="star"
+       style="display:inline;fill:#483737"
+       id="path551"
+       inkscape:flatsided="false"
+       sodipodi:sides="8"
+       sodipodi:cx="459.42816"
+       sodipodi:cy="307.70062"
+       sodipodi:r1="165.7141"
+       sodipodi:r2="82.857048"
+       sodipodi:arg1="0.78180774"
+       sodipodi:arg2="1.1745068"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 577.02568,424.45671 -85.61486,-40.3205 -31.38768,89.27744 -32.02795,-89.04974 -85.32312,40.93423 40.3205,-85.61485 -89.27744,-31.38768 89.04975,-32.02795 -40.93424,-85.32313 85.61486,40.3205 31.38768,-89.27744 32.02795,89.04975 85.32312,-40.93424 -40.3205,85.61486 89.27744,31.38768 -89.04975,32.02795 z"
+       inkscape:transform-center-x="5.4523158"
+       inkscape:transform-center-y="-5.1794555"
+       transform="matrix(0.66553982,0,0,0.66156367,246.66472,187.7997)" />
+    <path
+       sodipodi:type="star"
+       style="display:inline;fill:#483737"
+       id="path551-6"
+       inkscape:flatsided="false"
+       sodipodi:sides="8"
+       sodipodi:cx="459.42816"
+       sodipodi:cy="307.70062"
+       sodipodi:r1="165.7141"
+       sodipodi:r2="82.857048"
+       sodipodi:arg1="0.78180774"
+       sodipodi:arg2="1.1745068"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 577.02568,424.45671 -85.61486,-40.3205 -31.38768,89.27744 -32.02795,-89.04974 -85.32312,40.93423 40.3205,-85.61485 -89.27744,-31.38768 89.04975,-32.02795 -40.93424,-85.32313 85.61486,40.3205 31.38768,-89.27744 32.02795,89.04975 85.32312,-40.93424 -40.3205,85.61486 89.27744,31.38768 -89.04975,32.02795 z"
+       inkscape:transform-center-x="5.4523154"
+       inkscape:transform-center-y="-5.179458"
+       transform="matrix(0.66553982,0,0,0.66156367,291.29423,184.57635)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Layer 4"
+     style="display:inline">
+    <path
+       sodipodi:type="star"
+       style="display:inline;opacity:0.872476;fill:#916f6f;stroke:url(#radialGradient2376);filter:url(#filter2378)"
+       id="path551-6-5"
+       inkscape:flatsided="false"
+       sodipodi:sides="8"
+       sodipodi:cx="459.42816"
+       sodipodi:cy="307.70062"
+       sodipodi:r1="165.7141"
+       sodipodi:r2="82.857048"
+       sodipodi:arg1="0.78180774"
+       sodipodi:arg2="1.1745068"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 577.02568,424.45671 -85.61486,-40.3205 -31.38768,89.27744 -32.02795,-89.04974 -85.32312,40.93423 40.3205,-85.61485 -89.27744,-31.38768 89.04975,-32.02795 -40.93424,-85.32313 85.61486,40.3205 31.38768,-89.27744 32.02795,89.04975 85.32312,-40.93424 -40.3205,85.61486 89.27744,31.38768 -89.04975,32.02795 z"
+       inkscape:transform-center-x="5.8095127"
+       inkscape:transform-center-y="-5.6614062"
+       transform="matrix(0.70914169,0,0,0.7231216,246.65528,172.08508)" />
+    <path
+       sodipodi:type="star"
+       style="display:none;fill:#916f6f"
+       id="path551-7"
+       inkscape:flatsided="false"
+       sodipodi:sides="8"
+       sodipodi:cx="459.42816"
+       sodipodi:cy="307.70062"
+       sodipodi:r1="165.7141"
+       sodipodi:r2="82.857048"
+       sodipodi:arg1="0.78180774"
+       sodipodi:arg2="1.1745068"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 577.02568,424.45671 -85.61486,-40.3205 -31.38768,89.27744 -32.02795,-89.04974 -85.32312,40.93423 40.3205,-85.61485 -89.27744,-31.38768 89.04975,-32.02795 -40.93424,-85.32313 85.61486,40.3205 31.38768,-89.27744 32.02795,89.04975 85.32312,-40.93424 -40.3205,85.61486 89.27744,31.38768 -89.04975,32.02795 z"
+       inkscape:transform-center-x="4.1210948"
+       inkscape:transform-center-y="-4.4402139"
+       transform="matrix(0.50304396,0,0,0.56714091,322.21663,252.7886)" />
+    <path
+       style="display:inline;fill:#333333;fill-opacity:1;stroke-width:1.00157;stroke-dasharray:none;filter:url(#filter2409)"
+       d="m 375.69772,451.53385 4.49588,12.31453 10.65334,18.20075 11.85802,16.95891 20.58068,20.46441 17.45871,14.44072 22.6735,12.61856 22.7325,11.52127 29.2043,7.99742 39.44408,4.6549 28.13545,-0.90684 32.94233,-4.74645 45.00067,-16.78772 23.64305,-14.6259 25.5897,-21.13403 21.11312,-26.85901 16.55169,-28.18579 11.1509,-32.55705 3.35969,-33.67023 4.1208,12.7735 4.27896,15.32847 2.56942,17.85372 2.31057,24.50449 -1.99171,14.79426 -4.0993,23.60665 -17.40639,39.97759 -19.84816,28.9983 -33.1322,28.20447 -21.46146,13.87496 -29.54928,12.69901 -37.82319,10.01659 -30.9397,3.91729 -25.00879,-1.0488 -32.0519,-5.43024 -21.92736,-7.03461 -28.44597,-12.07314 -27.04127,-18.58368 -21.64161,-20.02754 -17.95017,-22.675 -12.81716,-21.17447 -10.75342,-23.57371 -4.95836,-34.81089 z"
+       id="path1445-2" />
+    <g
+       id="path1445">
+      <path
+         style="color:#000000;mix-blend-mode:normal;fill:#808080;stroke-width:3.77953;-inkscape-stroke:none;paint-order:stroke fill markers;filter:url(#filter3012)"
+         d="m 367.23021,421.25453 4.49588,12.31453 12.56834,37.33741 12.2128,11.25829 18.3109,7.02837 26.04006,49.10007 14.09215,-22.04079 21.68801,22.35943 34.15852,34.70948 35.53435,-32.89532 42.49082,37.77702 18.58696,-43.43031 65.23671,12.22099 17.28157,-35.48519 34.15537,-12.94607 4.31405,-37.6226 26.74902,-21.77371 -4.68759,-44.54292 3.35969,-33.67023 4.1208,12.7735 4.27896,15.32847 2.56942,17.85372 2.31057,24.50449 -1.99171,14.79426 -4.0993,23.60665 -17.40639,39.97759 -19.84816,28.9983 -33.1322,28.20447 -21.46146,13.87496 -29.54928,12.69901 -37.82319,10.01659 -30.9397,3.91729 -25.00879,-1.0488 -32.0519,-5.43024 -21.92736,-7.03461 -28.44597,-12.07314 -27.04127,-18.58368 -21.64161,-20.02754 -17.95017,-22.675 -12.81716,-21.17447 -10.75342,-23.57371 -4.95836,-34.81089 z"
+         id="path2980"
+         sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccc" />
+      <g
+         id="g2974">
+        <path
+           id="path2976"
+           style="fill:context-stroke;stroke-width:1.88977"
+           d="m 369.00537,420.60644 -1.12707,2.42325 -2.42325,-1.12707 1.74276,-0.73685 z"
+           sodipodi:nodetypes="sssssscsss" />
+      </g>
+    </g>
+    <ellipse
+       style="display:inline;fill:#f9f9f9;stroke-width:1.42287;filter:url(#filter2405)"
+       id="path1007"
+       cx="569.80951"
+       cy="389.62265"
+       rx="39.392666"
+       ry="36.017151" />
+  </g>
+  <metadata
+     id="metadata3138">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Uovo da Stella</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Ismael Belisario</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:description>Logo da SimpleT app</dc:description>
+        <dc:language>Italiano</dc:language>
+        <dc:coverage>SimpleT, 2022</dc:coverage>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Logo</rdf:li>
+            <rdf:li>SimpleT</rdf:li>
+            <rdf:li>Uovo</rdf:li>
+            <rdf:li>Stella</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc/4.0/" />
+        <dc:date>2022/07/20</dc:date>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

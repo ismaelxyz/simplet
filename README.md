@@ -1,17 +1,27 @@
-# SimpleT Gui
+# SimpleT - Translating without complications
 
-A graphical user interface for the [SimpleT](https://github.com/ismaelxyz/simplet/) application, its main dependency [eframe ](https://github.com/emilk/egui) (egui actually) allows to use both the web and desktop environment while still using Rust.
+## Introduction
 
-## Build Native
-```sh
-cargo build --release --bin simplet-gui
+This is a monumental improvement of my "Open Translation"* application, sometimes I don't want to open my browser to translate a small text, but at the same time I want different interpretations, listen to the pronunciation and have that data stored locally for later use. SimpleT is the solution to that.
+
+* This repository used to be called "Open Translation".
+
+## Requirements
+
+* [Python 3.10](https://www.python.org/) or later, with the packages:
+```bash
+pip install -r requirements
 ```
 
-## Build Web
-
-```sh
-# cargo install wasm-pack # for install crate wasm-pack and work with WASM
-cargo build --release --lib --target wasm32-unknown-unknown
-wasm-bindgen ./target/wasm32-unknown-unknown/release/simplet_gui.wasm --out-dir public/wasm --target web --no-typescript
+* [Rust 1.62.0](https://www.rust-lang.org/) or later, for the graphics interface.
+  Compile with:
+  
+```bash
+cargo install wasm-pack
+# "basic-http-server" maybe replace for:
+# python3 -m http.server 8888 --bind 127.0.0.1
+cargo install basic-http-server
+  
+wasm-pack build . -t web      # Web Version
+cargo build --bin simplet-gui # Native version
 ```
-

@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "cargo",
+            "name": "check",
+            "cargoArgs": ["+nightly", "check"],
+        },
+        {
+            "type": "cargo",
+            "name": "fmt",
+            "cargoArgs": ["+nightly", "fmt"],
+        },
+        {
+            "type": "cargo",
+            "name": "build",
+            "cargoArgs": ["+nightly", "build"],
+        },
+        {
+            "type": "cargo",
+            "name": "clippy",
+            "cargoArgs": ["+nightly", "clippy"],
+        },
+    ]
+}

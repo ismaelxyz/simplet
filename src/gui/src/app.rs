@@ -26,8 +26,8 @@ fn area(
                     let path = std::env::current_dir().unwrap();
 
                     let file_to_save = rfd::FileDialog::new()
-                        .set_file_name(&(hint_text.replace(" ", "-").to_lowercase() + ".txt"))
-                        .set_directory(&path)
+                        .set_file_name(&(hint_text.replace(' ', "-").to_lowercase() + ".txt"))
+                        .set_directory(path)
                         .save_file();
 
                     if let Some(absolute_path) = file_to_save {
