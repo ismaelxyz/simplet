@@ -1,7 +1,4 @@
-use crate::{
-    icons::Images,
-    menu::{Menu, Setting},
-};
+use crate::{icons::Images, menu::Menu, setting::Setting};
 use eframe::egui::{self, InnerResponse, Ui};
 
 #[allow(clippy::ptr_arg)] // it not is true

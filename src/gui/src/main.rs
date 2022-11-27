@@ -4,6 +4,7 @@ mod app;
 mod engines;
 mod icons;
 mod menu;
+mod setting;
 
 fn load_icon(path: &std::path::Path) -> Option<eframe::IconData> {
     let image = image::open(path)
@@ -25,7 +26,7 @@ fn main() {
         icon_data: load_icon(std::path::Path::new("./icons/simplet.png")),
         ..eframe::NativeOptions::default()
     };
-    
+
     eframe::run_native(
         "SimpleT",
         options,

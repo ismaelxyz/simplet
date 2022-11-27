@@ -5,6 +5,7 @@ mod app;
 mod engines;
 mod icons;
 mod menu;
+mod setting;
 
 #[cfg(target_arch = "wasm32")]
 use app::App;

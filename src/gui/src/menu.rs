@@ -1,9 +1,14 @@
-use crate::{engines::start as engines_start, icons::Images};
+use crate::{
+    engines::start as engines_start,
+    icons::Images,
+    setting::{self, Setting},
+};
+use deeptrans as dt;
 use eframe::egui::{self, pos2, Align, Id, Layout, Ui};
-use std::{collections::HashMap, env::var as env_var, path::PathBuf};
+use std::collections::HashMap;
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
-struct Language {
+pub(crate) struct Language {
     source_select: bool,
     source: String,
     target: String,
@@ -31,71 +36,98 @@ impl Default for Language {
 }
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
-struct Translator {
-    current: String,
+pub(crate) struct Translator {
+    current: usize,
     open: bool,
-    #[serde(skip)]
-    alternatives: Vec<String>,
+    // #[serde(skip)]
+    alternatives: Vec<dt::Translator>,
 }
 
 impl Translator {
-    fn alternatives() -> Vec<String> {
-        engines_start().into_keys().collect()
+    fn current(&self) -> &dt::Translator {
+        &self.alternatives[self.current]
+    }
+
+    fn current_engine(&self) -> &dt::Engine {
+        &self.current().engine
     }
 }
 
 impl Default for Translator {
     fn default() -> Self {
+        use dt::{Engine::*, Translator as DtTrans, Version};
+
         Translator {
-            current: "Google".to_string(),
+            current: 0,
             open: false,
-            alternatives: Translator::alternatives(),
+            alternatives: vec![
+                DtTrans::new("es", "en"),
+                DtTrans::with_engine(
+                    "de",
+                    "en",
+                    Deepl {
+                        api_key: String::new(),
+                        version: Version::V2,
+                        use_free_api: true,
+                    },
+                ),
+                DtTrans::with_engine(
+                    "en",
+                    "es",
+                    Libre {
+                        api_key: String::new(),
+                        url: "https://libretranslate.de/".into(),
+                    },
+                ),
+                DtTrans::with_engine("en", "de", Linguee { return_all: false }),
+                DtTrans::with_engine(
+                    "es",
+                    "de",
+                    Microsoft {
+                        api_key: String::new(),
+                        region: String::new(),
+                    },
+                ),
+                DtTrans::with_engine(
+                    "it",
+                    "es",
+                    MyMemory {
+                        email: String::new(),
+                        return_all: false,
+                    },
+                ),
+                DtTrans::with_engine(
+                    "fr",
+                    "en",
+                    Papago {
+                        client_id: String::new(),
+                        secret_key: String::new(),
+                    },
+                ),
+                DtTrans::with_engine("ar", "bg", Pons { return_all: false }),
+                DtTrans::with_engine(
+                    "es",
+                    "en",
+                    Qcri(dt::Qcri {
+                        api_key: String::new(),
+                        domain: String::new(),
+                    }),
+                ),
+                DtTrans::with_engine(
+                    "en",
+                    "de",
+                    Yandex {
+                        api_key: String::new(),
+                    },
+                ),
+            ],
         }
     }
 }
 
 #[derive(Default, Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
-struct AboutSimplet {
+pub(crate) struct AboutSimplet {
     open: bool,
-}
-
-#[derive(Default, Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
-pub(crate) struct Setting {
-    pub(crate) text_source: String,
-    pub(crate) text_target: String,
-    pub(crate) dark_theme: bool,
-    #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
-    pub(crate) decoration: bool,
-    language: Language,
-    translator: Translator,
-    about: AboutSimplet,
-}
-
-impl Setting {
-    fn file() -> PathBuf {
-        PathBuf::from(
-            env_var("HOME")
-                .or_else(|_| env_var("HOMEPATH"))
-                .unwrap_or_default(),
-        )
-        .join(".simplet")
-        .join("setting.json")
-    }
-
-    pub fn load() -> Result<Self, String> {
-        // let source = std::fs::read_to_string(Setting::file()).map_err(|err| err.to_string())?;
-        // let mut this: Self = serde_json::from_str(&source).map_err(|err| err.to_string())?;
-
-        // this.translator.alternatives = Translator::alternatives();
-        // this.language.alternatives = Language::alternatives(&this.translator.current);
-
-        Ok(Self::default()) //
-    }
-
-    pub fn save(&self) {
-        let data = serde_json::to_string(&self).unwrap();
-        std::fs::write(Setting::file(), data).unwrap();
-    }
 }
 
 fn switch(ui: &mut Ui, on: &mut bool) -> egui::Response {
@@ -138,7 +170,7 @@ impl Menu {
     ) {
         let _response;
         let images = self.images.take().unwrap_or_else(|| Images::menu(ctx));
-        let mut buttons = vec![];
+        let mut buttons = Vec::new();
 
         self.active = if let Some(Setting {
             text_source,
@@ -146,9 +178,12 @@ impl Menu {
             mut dark_theme,
             #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
             mut decoration,
-            mut language,
-            mut translator,
-            mut about,
+            menu:
+                setting::Menu {
+                    mut language,
+                    mut translator,
+                    mut about,
+                },
         }) = self.active.take()
         {
             egui::Window::new("Change Language")
@@ -177,8 +212,10 @@ impl Menu {
                     });
                 });
 
+            let mut is_open = translator.open;
+
             egui::Window::new("Setting")
-                .open(&mut translator.open)
+                .open(&mut is_open)
                 .show(ctx, |ui| {
                     egui::collapsing_header::CollapsingState::load_with_default_open(
                         ui.ctx(),
@@ -187,22 +224,24 @@ impl Menu {
                     )
                     .show_header(ui, |ui| {
                         // ...
-                        ui.label(format!("Change Engine - {}", &translator.current));
+                        ui.label(format!(
+                            "Change Engine - {}",
+                            translator.current_engine().name()
+                        ));
                     })
                     .body(|ui| {
                         egui::Grid::new("button_grid0").show(ui, |ui| {
-                            let current = translator.current.clone();
-                            for (index, alt) in translator
-                                .alternatives
-                                .iter()
-                                .filter(|alt| current[..] != alt[..])
+                            let current = translator.current;
+                            for (index, alt) in (0..translator.alternatives.len())
+                                .filter(|alt| current != *alt)
                                 .enumerate()
                             {
+                                let name = translator.alternatives[alt].name().to_owned();
                                 if ui
-                                    .radio_value(&mut translator.current, alt.to_string(), alt)
+                                    .radio_value(&mut translator.current, alt, &name)
                                     .clicked()
                                 {
-                                    language.alternatives = Language::alternatives(alt);
+                                    language.alternatives = Language::alternatives(&name);
                                     let mut keys = language.alternatives.keys();
                                     if !language.alternatives.contains_key(&language.source) {
                                         language.source = keys.next().cloned().unwrap();
@@ -246,7 +285,7 @@ impl Menu {
                         }
                     });
                 });
-
+            translator.open = is_open;
             egui::Window::new("About")
                 .open(&mut about.open)
                 .resizable(false)
@@ -279,9 +318,11 @@ impl Menu {
                 dark_theme,
                 #[cfg(all(feature = "debug", not(target_arch = "wasm32")))]
                 decoration,
-                language,
-                translator,
-                about,
+                menu: setting::Menu {
+                    language,
+                    translator,
+                    about,
+                },
             };
 
             let mut active = Some(());
@@ -292,9 +333,9 @@ impl Menu {
                 ui.horizontal(|ui| {
                     buttons = vec![
                         ui.add(images.button("menu-hide")),
-                        images.add_button(ui, setting.language.open, "change-language"),
-                        images.add_button(ui, setting.translator.open, "settings"),
-                        images.add_button(ui, setting.about.open, "about-simplet"),
+                        images.add_button(ui, setting.menu.language.open, "change-language"),
+                        images.add_button(ui, setting.menu.translator.open, "settings"),
+                        images.add_button(ui, setting.menu.about.open, "about-simplet"),
                         ui.add(images.button("swap")),
                     ];
 
@@ -306,15 +347,15 @@ impl Menu {
                     ui.spacing_mut().item_spacing.x = 10.0;
 
                     if buttons[1].clicked() {
-                        setting.language.open = true;
+                        setting.menu.language.open = true;
                     }
 
                     if buttons[2].clicked() {
-                        setting.translator.open = true;
+                        setting.menu.translator.open = true;
                     }
 
                     if buttons[3].clicked() {
-                        setting.about.open = true;
+                        setting.menu.about.open = true;
                     }
 
                     if buttons[4].clicked() {

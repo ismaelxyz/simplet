@@ -2,7 +2,7 @@ use crate::translator::response_status;
 use crate::Error;
 use reqwest::blocking as sync;
 
-#[derive(Debug, Default, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Qcri {
     /// Your qrci api key. Get one for free here https://mt.qcri.org/api/v1/ref
     pub api_key: String,

@@ -11,7 +11,7 @@ name = "deeptrans"
 
 [dependencies]
 reqwest = { version = "0.11.12", features = ["json", "blocking"] }
-#serde  = { version = "1.0.145", features = ["derive"]
+serde   = { version = "1.0.145", features = ["derive"] }
 #tokio   = { version = "1.21.2", features = ["full"] }
 serde_json = "1.0.86"
 clap       = "3.2.22"

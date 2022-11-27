@@ -12,7 +12,18 @@ macro_rules! codes_to_languages {
 
 pub type LanguagesToCodes = std::collections::HashMap<String, String>;
 
-#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(
+    Debug,
+    Default,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    serde::Deserialize,
+    serde::Serialize,
+)]
 pub enum Version {
     V1,
     #[default]
@@ -42,7 +53,7 @@ impl fmt::Display for Version {
 }
 
 /// Enum that wraps engines, which use the translator under the hood to translate word(s)
-#[derive(Debug, Default, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
 pub enum Engine {
     #[default]
     Google,
@@ -52,6 +63,9 @@ pub enum Engine {
         version: Version,
         use_free_api: bool,
     },
+    /// List of LibreTranslate endpoint can be found at:
+    /// https://github.com/LibreTranslate/LibreTranslate#mirrors
+    /// Some require an API key
     Libre {
         api_key: String,
         url: String,
@@ -106,6 +120,22 @@ impl Engine {
             Self::Pons { .. } => "https://en.pons.com/translate/".into(),
             Self::Qcri(..) => Qcri::base_url("translate"),
             Self::Yandex { .. } => "https://translate.yandex.net/api/v1.5/tr.json/translate".into(),
+        }
+    }
+
+    #[inline(always)]
+    pub const fn name(&self) -> &str {
+        match &self {
+            Self::Google => "Google",
+            Self::Deepl { .. } => "Deepl",
+            Self::Libre { .. } => "Libre",
+            Self::Linguee { .. } => "Linguee",
+            Self::Microsoft { .. } => "Microsoft",
+            Self::MyMemory { .. } => "MyMemory",
+            Self::Papago { .. } => "Papago",
+            Self::Pons { .. } => "Pons",
+            Self::Qcri(..) => "Qcri",
+            Self::Yandex { .. } => "Yandex",
         }
     }
 

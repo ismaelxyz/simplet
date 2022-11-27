@@ -22,21 +22,36 @@ fn response_status(response: sync::Response) -> Result<sync::Response, Error> {
     Ok(response)
 }
 
-#[derive(Default)]
+#[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Translator {
     pub source: String,
     pub target: String,
     pub engine: Engine,
+    #[serde(skip)]
     pub proxies: Vec<reqwest::Proxy>,
+}
+impl Eq for Translator {}
+impl PartialEq for Translator {
+    fn eq(&self, rhl: &Self) -> bool {
+        self.source == rhl.source && self.target == rhl.target && self.engine == rhl.engine
+    }
 }
 
 impl Translator {
     #[inline(always)]
-    pub fn new(source: String, target: String) -> Self {
+    pub fn new(source: &str, target: &str) -> Self {
         Self {
-            source,
-            target,
+            source: source.to_string(),
+            target: target.to_string(),
             ..Self::default()
+        }
+    }
+
+    #[inline(always)]
+    pub fn with_engine(source: &str, target: &str, engine: Engine) -> Self {
+        Self {
+            engine,
+            ..Self::new(source, target)
         }
     }
 

@@ -1,5 +1,5 @@
 [workspace]
 members = [
     "src/gui",
-    "src/deep_translator"
+    "src/deep-translator"
 ]
