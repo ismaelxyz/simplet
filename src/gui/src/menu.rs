@@ -1,11 +1,9 @@
 use crate::{
-    engines::start as engines_start,
     icons::Images,
     setting::{self, Setting},
 };
 use deeptrans as dt;
 use eframe::egui::{self, pos2, Align, Id, Layout, Ui};
-use std::collections::HashMap;
 
 #[derive(Eq, PartialEq, Clone, serde::Deserialize, serde::Serialize)]
 pub(crate) struct Language {
@@ -13,15 +11,10 @@ pub(crate) struct Language {
     source: String,
     target: String,
     open: bool,
-    #[serde(skip)]
-    alternatives: HashMap<String, String>,
+    alternatives: dt::LanguagesToCodes,
 }
 
-impl Language {
-    fn alternatives(engine: &str) -> HashMap<String, String> {
-        engines_start()[engine].clone()
-    }
-}
+impl Language {}
 
 impl Default for Language {
     fn default() -> Self {
@@ -30,7 +23,7 @@ impl Default for Language {
             source: "Spanish".to_string(),
             target: "English".to_string(),
             open: false,
-            alternatives: Self::alternatives("Google"),
+            alternatives: dt::Engine::Google.supported_languages(),
         }
     }
 }
@@ -39,7 +32,6 @@ impl Default for Language {
 pub(crate) struct Translator {
     current: usize,
     open: bool,
-    // #[serde(skip)]
     alternatives: Vec<dt::Translator>,
 }
 
@@ -199,12 +191,12 @@ impl Menu {
 
                     egui::Grid::new("button_grid1").show(ui, |ui| {
                         let mut current = &mut language.source;
-                        if language.source_select {
+                        if !language.source_select {
                             current = &mut language.target;
                         }
 
                         for (index, alternative) in language.alternatives.keys().enumerate() {
-                            ui.radio_value(current, alternative.to_string(), alternative);
+                            ui.radio_value(current, alternative.to_owned(), alternative);
                             if (index + 1) % 5 == 0 {
                                 ui.end_row();
                             }
@@ -241,7 +233,8 @@ impl Menu {
                                     .radio_value(&mut translator.current, alt, &name)
                                     .clicked()
                                 {
-                                    language.alternatives = Language::alternatives(&name);
+                                    language.alternatives =
+                                        translator.current().supported_languages();
                                     let mut keys = language.alternatives.keys();
                                     if !language.alternatives.contains_key(&language.source) {
                                         language.source = keys.next().cloned().unwrap();

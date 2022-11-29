@@ -2,7 +2,6 @@
 use wasm_bindgen::prelude::*;
 
 mod app;
-mod engines;
 mod icons;
 mod menu;
 mod setting;
