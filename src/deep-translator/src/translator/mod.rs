@@ -1,7 +1,6 @@
 mod engine;
 mod qcri;
 
-// StatusCode
 use crate::Error;
 pub use engine::*;
 pub use qcri::Qcri;
@@ -23,18 +22,14 @@ fn response_status(response: sync::Response) -> Result<sync::Response, Error> {
 }
 
 #[derive(Debug, Default, Clone, serde::Deserialize, serde::Serialize)]
+/// A Translator
 pub struct Translator {
     pub source: String,
     pub target: String,
     pub engine: Engine,
+    #[cfg(not(target_arch = "wasm32"))]
     #[serde(skip)]
     pub proxies: Vec<reqwest::Proxy>,
-}
-impl Eq for Translator {}
-impl PartialEq for Translator {
-    fn eq(&self, rhl: &Self) -> bool {
-        self.source == rhl.source && self.target == rhl.target && self.engine == rhl.engine
-    }
 }
 
 impl Translator {
@@ -54,6 +49,18 @@ impl Translator {
             ..Self::new(source, target)
         }
     }
+    
+    #[inline(always)]
+    fn client(&self) -> sync::ClientBuilder {
+        let mut client = sync::Client::builder();
+
+        #[cfg(not(target_arch = "wasm32"))]
+        for proxy in self.proxies.clone() {
+            client = client.proxy(proxy);
+        }
+        
+        client
+    }
 
     #[inline(always)]
     fn request<I: Into<Option<String>>>(
@@ -62,13 +69,8 @@ impl Translator {
         url_params: &[(&str, &str)],
     ) -> Result<sync::Response, Error> {
         let url = I::into(url).unwrap_or_else(|| self.base_url());
-        let mut client = sync::Client::builder();
-
-        for proxy in self.proxies.clone() {
-            client = client.proxy(proxy);
-        }
-
-        let response = client.build()?.get(url).query(&url_params).send()?;
+        
+        let response = self.client().build()?.get(url).query(&url_params).send()?;
 
         response_status(response)
     }
@@ -130,13 +132,7 @@ impl Translator {
                     url_params.push(("api_key", api_key))
                 }
 
-                let mut client = sync::Client::builder();
-
-                for proxy in self.proxies.clone() {
-                    client = client.proxy(proxy);
-                }
-
-                let response = client
+                let response = self.client()
                     .build()?
                     .post(self.base_url())
                     .query(&url_params)
@@ -187,12 +183,8 @@ impl Translator {
                 }
             }
             Engine::Microsoft { api_key, region } => {
-                let mut client = sync::Client::builder();
-                for proxy in self.proxies.clone() {
-                    client = client.proxy(proxy);
-                }
 
-                let mut request = client
+                let mut request = self.client()
                     .build()?
                     .post(self.base_url())
                     .header("Ocp-Apim-Subscription-Key", api_key)
@@ -268,7 +260,7 @@ impl Translator {
                 client_id,
                 secret_key,
             } => {
-                let mut response = sync::Client::builder()
+                let mut response = self.client()
                     .build()?
                     .post(self.base_url())
                     .header("X-Naver-Client-Id", client_id)
@@ -343,13 +335,8 @@ impl Translator {
                 Ok(response["translatedText"].clone())
             }
             Engine::Yandex { api_key } => {
-                let mut client = sync::Client::builder();
-
-                for proxy in self.proxies.clone() {
-                    client = client.proxy(proxy);
-                }
-
-                let response = client
+                
+                let response = self.client()
                     .build()?
                     .post(self.base_url())
                     .form(&[
@@ -378,6 +365,14 @@ impl Translator {
             .collect()
     }
 }
+
+impl Eq for Translator {}
+impl PartialEq for Translator {
+    fn eq(&self, rhl: &Self) -> bool {
+        self.source == rhl.source && self.target == rhl.target && self.engine == rhl.engine
+    }
+}
+
 
 impl Deref for Translator {
     type Target = Engine;

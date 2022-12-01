@@ -3,7 +3,7 @@ use deeptrans::*;
 
 //#[tokio::main]
 fn main() -> Result<(), Error> {
-    let mut matches = clap::Command::new("deep-translator")
+    let matches = clap::Command::new("deep-translator")
         .bin_name("deep-translator")
         .about("Official CLI for Deep Translator")
         .long_about(
@@ -161,6 +161,7 @@ fn main() -> Result<(), Error> {
                     "all the languages available with the translator. \
                     Run the command deep_translator --engine <translator service> --languages",
                 ),
+            #[cfg(not(target_arch = "wasm32"))]
             Arg::new("proxy")
                 .long("--proxy")
                 .takes_value(true)
@@ -171,10 +172,11 @@ fn main() -> Result<(), Error> {
         .get_matches();
 
     let mut translator = Translator::new(
-        matches.remove_one::<String>("source").unwrap(),
-        matches.remove_one::<String>("target").unwrap(),
+        matches.get_one::<String>("source").unwrap(),
+        matches.get_one::<String>("target").unwrap(),
     );
 
+    #[cfg(not(target_arch = "wasm32"))]
     if let Ok(Some(many)) = matches.try_get_many::<String>("proxy") {
         translator.proxies = many.map(reqwest::Proxy::http).collect::<Result<_, _>>()?;
     }
